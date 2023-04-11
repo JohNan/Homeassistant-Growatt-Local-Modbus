@@ -327,7 +327,7 @@ class GrowattDevice:
         """
         Based on the various register values the status of the device can be determined.
         """
-        if self.device in (DeviceTypes.INVERTER, DeviceTypes.INVERTER_315, DeviceTypes.INVERTER_120):
+        if self.device in (DeviceTypes.INVERTER, DeviceTypes.INVERTER_315, DeviceTypes.INVERTER_120, DeviceTypes.INVERTER_124):
             return inverter_status(value)
 
 
@@ -340,6 +340,8 @@ async def get_device_info(device: GrowattModbusBase, unit: int, fixed_device_typ
             return await device.get_device_info(HOLDING_REGISTERS_120, minimal_length, unit)
         elif fixed_device_types == DeviceTypes.INVERTER_315:
             return await device.get_device_info(HOLDING_REGISTERS_315, minimal_length, unit)
+        elif fixed_device_types == DeviceTypes.INVERTER_124:
+            return await device.get_device_info(HOLDING_REGISTERS_124, minimal_length, unit)
         else:
             return None
 
@@ -350,8 +352,13 @@ async def get_device_info(device: GrowattModbusBase, unit: int, fixed_device_typ
     inverter_v315 = await device.get_device_info(HOLDING_REGISTERS_315, minimal_length, unit)
     _LOGGER.info(f"Inverter Protocol v3.15: {inverter_v315}")
 
+    inverter_v124 = await device.get_device_info(HOLDING_REGISTERS_124, minimal_length, unit)
+    _LOGGER.info(f"Inverter Protocol v1.24: {inverter_v124}") 
+
     if 1.0 < inverter_v120.modbus_version < 1.20:
         return inverter_v120
+    elif 1.20 < inverter_v124.modbus_version < 1.24:
+        return inverter_v124
     elif 3.0 < inverter_v315.modbus_version < 3.15:
         return inverter_v315
     else:
