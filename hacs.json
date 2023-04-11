@@ -1,6 +1,6 @@
 {
   "name": "Growatt Local Modbus (v1.24)",
   "render_readme": true,
-  "zip_release": false,
-  "hide_default_branch": true
+  "zip_release": false
+
 }
