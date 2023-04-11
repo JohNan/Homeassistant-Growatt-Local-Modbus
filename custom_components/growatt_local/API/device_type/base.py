@@ -106,6 +106,18 @@ ATTR_N_BUS_VOLTAGE = "n_bus_voltage"  # V
 
 ATTR_OUTPUT_PERCENTAGE = "real_output_power_percent"  # %
 
+# 1.24 registers
+ATTR_SOC_PERCENTAGE = "soc"  # %
+ATTR_DISCHARGE_POWER = "discharge_power"  # W
+ATTR_CHARGE_POWER = "charge_power"  # W
+ATTR_ENERGY_TO_USER_TODAY = "energy_to_user_today"  # kWh
+ATTR_ENERGY_TO_USER_TOTAL = "energy_to_user_total"  # kWh
+ATTR_ENERGY_TO_GRID_TODAY = "energy_to_grid_today"  # kWh
+ATTR_ENERGY_TO_GRID_TOTAL = "energy_to_grid_total"  # kWh
+ATTR_DISCHARGE_ENERGY_TODAY = "discharge_energy_today"  # kWh
+ATTR_DISCHARGE_ENERGY_TOTAL = "discharge_energy_total"  # kWh
+ATTR_CHARGE_ENERGY_TODAY = "charge_energy_today"  # kWh
+ATTR_CHARGE_ENERGY_TOTAL = "charge_energy_total"  # kWh
 
 class custom_function(type):
     """

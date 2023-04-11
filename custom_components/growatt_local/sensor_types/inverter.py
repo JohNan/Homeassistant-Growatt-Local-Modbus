@@ -126,6 +126,19 @@ ATTR_N_BUS_VOLTAGE = "n_bus_voltage"  # V
 
 ATTR_OUTPUT_PERCENTAGE = "real_output_power_percent"  # %
 
+# 1.24 registers
+ATTR_SOC_PERCENTAGE = "soc"  # %
+ATTR_DISCHARGE_POWER = "discharge_power"  # W
+ATTR_CHARGE_POWER = "charge_power"  # W
+ATTR_ENERGY_TO_USER_TODAY = "energy_to_user_today"  # kWh
+ATTR_ENERGY_TO_USER_TOTAL = "energy_to_user_total"  # kWh
+ATTR_ENERGY_TO_GRID_TODAY = "energy_to_grid_today"  # kWh
+ATTR_ENERGY_TO_GRID_TOTAL = "energy_to_grid_total"  # kWh
+ATTR_DISCHARGE_ENERGY_TODAY = "discharge_energy_today"  # kWh
+ATTR_DISCHARGE_ENERGY_TOTAL = "discharge_energy_total"  # kWh
+ATTR_CHARGE_ENERGY_TODAY = "charge_energy_today"  # kWh
+ATTR_CHARGE_ENERGY_TOTAL = "charge_energy_total"  # kWh
+
 
 from .sensor_entity_description import GrowattSensorEntityDescription
 
@@ -517,6 +530,24 @@ INVERTER_SENSOR_TYPES: tuple[GrowattSensorEntityDescription, ...] = (
         name="Real power output percentage",
         native_unit_of_measurement=PERCENTAGE,
         device_class=SensorDeviceClass.POWER_FACTOR
+    ),
+    GrowattSensorEntityDescription(
+        key=ATTR_SOC_PERCENTAGE,
+        name="SOC",
+        native_unit_of_measurement=PERCENTAGE,
+        device_class=SensorDeviceClass.BATTERY
+    ),
+    GrowattSensorEntityDescription(
+        key=ATTR_DISCHARGE_POWER,
+        name="Discharge Power",
+        native_unit_of_measurement=POWER_WATT,
+        device_class=SensorDeviceClass.POWER
+    ),
+    GrowattSensorEntityDescription(
+        key=ATTR_CHARGE_POWER,
+        name="Charge Power",
+        native_unit_of_measurement=POWER_WATT,
+        device_class=SensorDeviceClass.POWER
     ),
     GrowattSensorEntityDescription(key="status", name="Status", device_class=f"growatt_local__status"),
 )

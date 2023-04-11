@@ -38,6 +38,7 @@ from .device_type.base import (
     inverter_status,
 )
 from .device_type.inverter_120 import MAXIMUM_DATA_LENGTH_120, HOLDING_REGISTERS_120, INPUT_REGISTERS_120
+from .device_type.inverter_124 import MAXIMUM_DATA_LENGTH_124, INPUT_REGISTERS_124, HOLDING_REGISTERS_124
 from .device_type.inverter_315 import MAXIMUM_DATA_LENGTH_315, HOLDING_REGISTERS_315, INPUT_REGISTERS_315
 
 from .exception import ModbusException, ModbusPortException
@@ -249,6 +250,14 @@ class GrowattDevice:
             }
             self.input_register = {
                 obj.register: obj for obj in INPUT_REGISTERS_120
+            }
+        elif GrowattDeviceType == DeviceTypes.INVERTER_124:
+            self.max_length = MAXIMUM_DATA_LENGTH_124
+            self.holding_register = {
+                obj.register: obj for obj in HOLDING_REGISTERS_124
+            }
+            self.input_register = {
+                obj.register: obj for obj in INPUT_REGISTERS_124
             }
 
         self.unit = unit

@@ -57,7 +57,7 @@ async def async_setup_entry(
 
     device_type = DeviceTypes(config_entry.data[CONF_TYPE])
 
-    if device_type in (DeviceTypes.INVERTER, DeviceTypes.INVERTER_315, DeviceTypes.INVERTER_120):
+    if device_type in (DeviceTypes.INVERTER, DeviceTypes.INVERTER_315, DeviceTypes.INVERTER_120, DeviceTypes.INVERTER_124):
         supported_key_names = coordinator.growatt_api.get_register_names()
 
         for sensor in INVERTER_SENSOR_TYPES:

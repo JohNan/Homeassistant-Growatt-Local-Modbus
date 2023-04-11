@@ -58,6 +58,7 @@ PARITY_OPTION = [
 
 DEVICETYPES_OPTION = [
     selector.SelectOptionDict(value=DeviceTypes.INVERTER_120, label="Inverter Protocol version 1.20"),
+    selector.SelectOptionDict(value=DeviceTypes.INVERTER_124, label="Inverter Protocol version 1.24"),
     selector.SelectOptionDict(value=DeviceTypes.INVERTER_315, label="Inverter Protocol version 3.05-3.15"),
 ]
 
