@@ -162,6 +162,7 @@ DEVICE_TYPE_CODES = {
     0xA00: "2 tracker and 3phase Grid connect PV inverter LF",
     3100: "Front 1 tracker PV Storage",
     3400: "OffGrid SPF 3-5K",
+    5400: "MOD 3-10KTL3-XH",
     10001: "RF-ShineVersion",
     10002: "Web-ShinePano",
     10003: "Web-ShineWebBox",
