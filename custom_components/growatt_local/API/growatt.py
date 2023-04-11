@@ -357,7 +357,7 @@ async def get_device_info(device: GrowattModbusBase, unit: int, fixed_device_typ
 
     if 1.0 < inverter_v120.modbus_version < 1.20:
         return inverter_v120
-    elif 1.20 < inverter_v124.modbus_version < 1.24:
+    elif inverter_v124.modbus_version == 3.05:
         return inverter_v124
     elif 3.0 < inverter_v315.modbus_version < 3.15:
         return inverter_v315
