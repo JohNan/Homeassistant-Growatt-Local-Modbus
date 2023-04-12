@@ -318,7 +318,9 @@ INPUT_REGISTERS_124: tuple[GrowattDeviceRegisters, ...] = (
     ),
     
     GrowattDeviceRegisters(name=ATTR_WARNING_VALUE, register=65, value_type=int),
-    GrowattDeviceRegisters(name=ATTR_SOC_PERCENTAGE, register=1014, value_type=int),
+    GrowattDeviceRegisters(
+        name=ATTR_SOC_PERCENTAGE, register=1014, value_type=int
+    ),
     GrowattDeviceRegisters(
         name=ATTR_DISCHARGE_POWER, register=1009, value_type=float, length=2
     ),

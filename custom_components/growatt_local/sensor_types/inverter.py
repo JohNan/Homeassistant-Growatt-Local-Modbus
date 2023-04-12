@@ -549,5 +549,20 @@ INVERTER_SENSOR_TYPES: tuple[GrowattSensorEntityDescription, ...] = (
         native_unit_of_measurement=POWER_WATT,
         device_class=SensorDeviceClass.POWER
     ),
+    GrowattSensorEntityDescription(
+        key=ATTR_ENERGY_TO_GRID_TOTAL,
+        name="Energy To Grid (Total)",
+        native_unit_of_measurement=ENERGY_KILO_WATT_HOUR,
+        device_class=SensorDeviceClass.ENERGY,
+        state_class=SensorStateClass.TOTAL_INCREASING,
+    ),
+    GrowattSensorEntityDescription(
+        key=ATTR_ENERGY_TO_GRID_TODAY,
+        name="Energy To Grid (Today)",
+        native_unit_of_measurement=ENERGY_KILO_WATT_HOUR,
+        device_class=SensorDeviceClass.ENERGY,
+        state_class=SensorStateClass.TOTAL_INCREASING,
+        midnight_reset=True
+    ),
     GrowattSensorEntityDescription(key="status", name="Status", device_class=f"growatt_local__status"),
 )
