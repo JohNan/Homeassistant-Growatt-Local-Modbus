@@ -383,5 +383,10 @@ INPUT_REGISTERS_124: tuple[GrowattDeviceRegisters, ...] = (
         name=ATTR_CHARGE_ENERGY_TOTAL, register=3131, value_type=float, length=2
 
     ),
+    GrowattDeviceRegisters(
+
+        name=ATTR_AC_CHARGE_ENABLED, register=3049, value_type=int, length=1
+
+    ),
 
 )
