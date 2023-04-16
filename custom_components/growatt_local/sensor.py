@@ -74,11 +74,7 @@ async def async_setup_entry(
 
             sensor_descriptions.append(sensor)
 
-        power_sensor = (ATTR_INPUT_POWER, ATTR_OUTPUT_POWER, ATTR_SOC_PERCENTAGE,
-
-ATTR_DISCHARGE_POWER,
-
-    ATTR_CHARGE_POWER )
+        power_sensor = (ATTR_INPUT_POWER, ATTR_OUTPUT_POWER, ATTR_SOC_PERCENTAGE, ATTR_DISCHARGE_POWER, ATTR_CHARGE_POWER)
 
     else:
         _LOGGER.debug(
