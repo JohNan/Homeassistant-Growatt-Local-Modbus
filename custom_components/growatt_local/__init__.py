@@ -172,9 +172,8 @@ class GrowattLocalCoordinator(DataUpdateCoordinator):
         status = None
         data = {}
 
-        if self._sun_is_down:
-            return {"status": "Offline"}
-
+#        if self._sun_is_down:
+ #           return {"status": "Offline"}
         try:
             if self._counter >= self._max_counter or self._failed_update_count > 0:
                 self._counter = 0
