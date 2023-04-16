@@ -138,6 +138,7 @@ ATTR_DISCHARGE_ENERGY_TODAY = "discharge_energy_today"  # kWh
 ATTR_DISCHARGE_ENERGY_TOTAL = "discharge_energy_total"  # kWh
 ATTR_CHARGE_ENERGY_TODAY = "charge_energy_today"  # kWh
 ATTR_CHARGE_ENERGY_TOTAL = "charge_energy_total"  # kWh
+ATTR_AC_CHARGE_ENABLED = "a_charge_enabled" # bool / binary 
 
 
 from .sensor_entity_description import GrowattSensorEntityDescription
@@ -563,6 +564,15 @@ INVERTER_SENSOR_TYPES: tuple[GrowattSensorEntityDescription, ...] = (
         device_class=SensorDeviceClass.ENERGY,
         state_class=SensorStateClass.TOTAL_INCREASING,
         midnight_reset=True
+    ),
+    GrowattSensorEntityDescription(
+
+        key=ATTR_AC_CHARGE_ENABLED,
+
+        name="AC Charge Enabled"
+
+
+
     ),
     GrowattSensorEntityDescription(key="status", name="Status", device_class=f"growatt_local__status"),
 )
