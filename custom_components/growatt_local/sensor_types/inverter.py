@@ -138,7 +138,7 @@ ATTR_DISCHARGE_ENERGY_TODAY = "discharge_energy_today"  # kWh
 ATTR_DISCHARGE_ENERGY_TOTAL = "discharge_energy_total"  # kWh
 ATTR_CHARGE_ENERGY_TODAY = "charge_energy_today"  # kWh
 ATTR_CHARGE_ENERGY_TOTAL = "charge_energy_total"  # kWh
-ATTR_AC_CHARGE_ENABLED = "a_charge_enabled" # bool / binary 
+ATTR_AC_CHARGE_ENABLED = "ac_charge_enabled" # bool / binary 
 
 
 from .sensor_entity_description import GrowattSensorEntityDescription
