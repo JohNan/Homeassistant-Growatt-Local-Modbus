@@ -1,9 +1,6 @@
 """Growatt Sensor definitions for the Inverter type."""
 from __future__ import annotations
-from datetime import datetime
-from decimal import Decimal
 
-from homeassistant.core import Event
 from homeassistant.components.sensor import (
     SensorDeviceClass,
     SensorStateClass,
@@ -18,9 +15,12 @@ from homeassistant.const import (
     TIME_HOURS,
     PERCENTAGE,
 )
+from .select_entity_description import GrowattSelectEntityDescription
+from .sensor_entity_description import GrowattSensorEntityDescription
+from .switch_entity_description import GrowattSwitchEntityDescription
 
 # relative import NOT WORKING due to into higher located reference
-# from .growatt_local.API.device_type.base import ATTR 
+# from .growatt_local.API.device_type.base import ATTR
 
 # Attribute names for values in the holding register
 
@@ -138,10 +138,26 @@ ATTR_DISCHARGE_ENERGY_TODAY = "discharge_energy_today"  # kWh
 ATTR_DISCHARGE_ENERGY_TOTAL = "discharge_energy_total"  # kWh
 ATTR_CHARGE_ENERGY_TODAY = "charge_energy_today"  # kWh
 ATTR_CHARGE_ENERGY_TOTAL = "charge_energy_total"  # kWh
-ATTR_AC_CHARGE_ENABLED = "ac_charge_enabled" # bool / binary 
+ATTR_AC_CHARGE_ENABLED = "ac_charge_enabled"  # bool / binary
 
 
-from .sensor_entity_description import GrowattSensorEntityDescription
+INVERTER_SELECT_TYPES: tuple[GrowattSelectEntityDescription, ...] = (
+    GrowattSelectEntityDescription(
+        key=ATTR_AC_CHARGE_ENABLED,
+        name="AC Charge",
+        options_dict={
+            0: "Disabled",
+            1: "Enabled"
+        }
+    ),
+)
+
+INVERTER_SWITCH_TYPES: tuple[GrowattSwitchEntityDescription, ...] = (
+    GrowattSwitchEntityDescription(
+        key=ATTR_AC_CHARGE_ENABLED,
+        name="AC Charge"
+    ),
+)
 
 INVERTER_SENSOR_TYPES: tuple[GrowattSensorEntityDescription, ...] = (
     GrowattSensorEntityDescription(
@@ -150,7 +166,7 @@ INVERTER_SENSOR_TYPES: tuple[GrowattSensorEntityDescription, ...] = (
         native_unit_of_measurement=ENERGY_KILO_WATT_HOUR,
         device_class=SensorDeviceClass.ENERGY,
         state_class=SensorStateClass.TOTAL_INCREASING,
-        midnight_reset=True,
+        midnight_reset=True
     ),
     GrowattSensorEntityDescription(
         key=ATTR_OUTPUT_ENERGY_TOTAL,
@@ -566,13 +582,8 @@ INVERTER_SENSOR_TYPES: tuple[GrowattSensorEntityDescription, ...] = (
         midnight_reset=True
     ),
     GrowattSensorEntityDescription(
-
         key=ATTR_AC_CHARGE_ENABLED,
-
         name="AC Charge Enabled"
-
-
-
     ),
     GrowattSensorEntityDescription(key="status", name="Status", device_class=f"growatt_local__status"),
 )

@@ -33,6 +33,7 @@ from homeassistant.helpers.update_coordinator import (
     DataUpdateCoordinator,
     UpdateFailed,
 )
+from .API.device_type.base import GrowattDeviceRegisters
 
 from .const import (
     CONF_LAYER,
@@ -139,6 +140,7 @@ class GrowattLocalCoordinator(DataUpdateCoordinator):
         self.growatt_api = growatt_api
         self._failed_update_count = 0
         self.keys = set()
+        self.holding_keys = set()
         self.p_keys = set()
         self._midnight_listeners: dict[
             CALLBACK_TYPE, tuple[CALLBACK_TYPE, object | None]
@@ -178,6 +180,9 @@ class GrowattLocalCoordinator(DataUpdateCoordinator):
             if self._counter >= self._max_counter or self._failed_update_count > 0:
                 self._counter = 0
                 data = await self.growatt_api.update(self.keys)
+                holding_data = await self.growatt_api.update_holding(self.holding_keys)
+                data.update(holding_data)
+                _LOGGER.debug(f"Updated data: {data}")
             else:
                 self._counter += 1
                 data = await self.growatt_api.update(self.p_keys)
@@ -269,3 +274,26 @@ class GrowattLocalCoordinator(DataUpdateCoordinator):
             self.keys.update(keys)
 
         return keys
+
+    @callback
+    def get_holding_keys_by_name(
+        self, names: Sequence[str], update_keys: bool = False
+    ) -> set[int]:
+        """
+        Loopup modbus register values based on name.
+        Setting update_keys automaticly extends the list of keys to request.
+        """
+        keys = self.growatt_api.get_holding_keys_by_name(names)
+        if update_keys:
+            self.holding_keys.update(keys)
+
+        return keys
+
+    def get_register_by_name(self, name) -> GrowattDeviceRegisters:
+        return self.growatt_api.get_register_by_name(name)
+
+    def get_holding_register_by_name(self, name) -> GrowattDeviceRegisters:
+        return self.growatt_api.get_holding_register_by_name(name)
+
+    async def write_register(self, register, payload):
+        await self.growatt_api.write_register(register, payload)

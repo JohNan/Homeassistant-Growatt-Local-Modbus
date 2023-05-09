@@ -112,10 +112,10 @@ def split_sequence(keys: list[int], maximum_length: int) -> list[int]:
 
     _LOGGER.debug(f"split sequence indexes based on maximum length: {cumulative_key_seperation_index}")
 
-    # check if both methodes find equal index seperation values
+    # check if both methods find equal index separation values
     common_index = cumulative_key_seperation_index.intersection(diff_key_seperation_index)
 
-    _LOGGER.debug(f"split sequence commom indexes: {common_index}")
+    _LOGGER.debug(f"split sequence common indexes: {common_index}")
 
     cumulative_key_seperation_index.difference_update(common_index)
     diff_key_seperation_index.difference_update(common_index)
@@ -124,18 +124,18 @@ def split_sequence(keys: list[int], maximum_length: int) -> list[int]:
         return sorted(common_index)
 
     if len(cumulative_key_seperation_index) > 0:
-        # sorting the seperation index fixes the processing from small to higher
+        # sorting the separation index fixes the processing from small to higher
         for item in sorted(cumulative_key_seperation_index):
             if len(diff_key_seperation_index) == 0:
                 common_index.add(item)
                 cumulative_key_seperation_index.remove(item)
                 continue
 
-            # Trying to optimize the number split by checking if there is a larger seperation nearby
+            # Trying to optimize the number split by checking if there is a larger separation nearby
             closest_value = min(diff_key_seperation_index, key=lambda x: abs(x - item))
 
             if len(common_index) == 0:
-                # checking if closest seperation is not violating the maximum length
+                # checking if closest separation is not violating the maximum length
                 if keys[closest_value - 1] - keys[0] < maximum_length:
                     common_index.add(closest_value)
                     cumulative_key_seperation_index.remove(item)
@@ -154,7 +154,7 @@ def split_sequence(keys: list[int], maximum_length: int) -> list[int]:
                     cumulative_key_seperation_index.remove(item)
                     continue
 
-                # closest_value falls within the same known sepeation as item
+                # closest_value falls within the same known separation as item
                 if smaller_common_value is None:
                     if keys[closest_value - 1] - keys[0] < maximum_length:
                         common_index.add(closest_value)

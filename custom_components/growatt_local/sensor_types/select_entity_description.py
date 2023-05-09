@@ -3,17 +3,19 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-from homeassistant.components.sensor import SensorEntityDescription
+from homeassistant.components.select import SelectEntityDescription
 
 
 @dataclass
-class GrowattSensorRequiredKeysMixin:
+class GrowattSelectRequiredKeysMixin:
     """Mixin for required keys."""
 
     key: str
-    midnight_reset: bool = False
+    options_dict: dict[int, str]
 
 
 @dataclass
-class GrowattSensorEntityDescription(GrowattSensorRequiredKeysMixin, SensorEntityDescription):
+class GrowattSelectEntityDescription(SelectEntityDescription, GrowattSelectRequiredKeysMixin):
     """Describes Growatt sensor entity."""
+
+

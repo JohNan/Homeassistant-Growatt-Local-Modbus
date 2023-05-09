@@ -47,7 +47,7 @@ from .base import (
     ATTR_IPM_TEMPERATURE,
     ATTR_P_BUS_VOLTAGE,
     ATTR_N_BUS_VOLTAGE,
-    ATTR_OUTPUT_PERCENTAGE,
+    ATTR_OUTPUT_PERCENTAGE, ATTR_SERIAL_NUMBER,
 )
 
 
@@ -65,6 +65,9 @@ def model(registers) -> str:
         (mo & 0x00000F)
     )
 
+SERIAL_NUMBER_REGISTER = GrowattDeviceRegisters(
+    name=ATTR_SERIAL_NUMBER, register=23, value_type=str, length=5
+)
 
 HOLDING_REGISTERS_315: tuple[GrowattDeviceRegisters, ...] = (
     FIRMWARE_REGISTER,

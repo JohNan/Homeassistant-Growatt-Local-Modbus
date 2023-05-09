@@ -1,4 +1,5 @@
 """Device defaults for a Growatt Inverter."""
+from dataclasses import dataclass
 
 from .base import (
     GrowattDeviceRegisters,
@@ -81,11 +82,8 @@ from .base import (
     ATTR_OUTPUT_PERCENTAGE,
     ATTR_SOC_PERCENTAGE, ATTR_DISCHARGE_POWER, ATTR_CHARGE_POWER, ATTR_ENERGY_TO_USER_TODAY, ATTR_ENERGY_TO_USER_TOTAL,
     ATTR_ENERGY_TO_GRID_TODAY, ATTR_ENERGY_TO_GRID_TOTAL, ATTR_DISCHARGE_ENERGY_TODAY, ATTR_DISCHARGE_ENERGY_TOTAL,
-    ATTR_CHARGE_ENERGY_TODAY, ATTR_CHARGE_ENERGY_TOTAL, ATTR_AC_CHARGE_ENABLED, 
+    ATTR_CHARGE_ENERGY_TODAY, ATTR_CHARGE_ENERGY_TOTAL, ATTR_AC_CHARGE_ENABLED, ATTR_SERIAL_NUMBER, GrowattDeviceInfo,
 )
-
-
-
 
 MAXIMUM_DATA_LENGTH_124 = 100
 
@@ -104,9 +102,13 @@ def model(registers) -> str:
     )
 
 
+SERIAL_NUMBER_REGISTER_124 = GrowattDeviceRegisters(
+    name=ATTR_SERIAL_NUMBER, register=3001, value_type=str, length=14
+)
+
 HOLDING_REGISTERS_124: tuple[GrowattDeviceRegisters, ...] = (
     FIRMWARE_REGISTER,
-    SERIAL_NUMBER_REGISTER,
+    SERIAL_NUMBER_REGISTER_124,
     GrowattDeviceRegisters(
         name=ATTR_INVERTER_MODEL,
         register=28,
@@ -121,7 +123,13 @@ HOLDING_REGISTERS_124: tuple[GrowattDeviceRegisters, ...] = (
         register=88,
         value_type=float,
         scale=100
-    )
+    ),
+    GrowattDeviceRegisters(
+        name=ATTR_AC_CHARGE_ENABLED,
+        register=1092,
+        value_type=int,
+        length=1
+    ),
 )
 
 INPUT_REGISTERS_124: tuple[GrowattDeviceRegisters, ...] = (
@@ -316,77 +324,38 @@ INPUT_REGISTERS_124: tuple[GrowattDeviceRegisters, ...] = (
     GrowattDeviceRegisters(
         name=ATTR_OUTPUT_REACTIVE_ENERGY_TOTAL, register=62, value_type=float, length=2,
     ),
-    
     GrowattDeviceRegisters(name=ATTR_WARNING_VALUE, register=65, value_type=int),
     GrowattDeviceRegisters(
-
         name=ATTR_SOC_PERCENTAGE, register=3171, value_type=int
-
     ),
-
     GrowattDeviceRegisters(
-
         name=ATTR_DISCHARGE_POWER, register=3178, value_type=float, length=2
-
     ),
-
     GrowattDeviceRegisters(
-
         name=ATTR_CHARGE_POWER, register=3180, value_type=float, length=2
-
     ),
-
     GrowattDeviceRegisters(
-
         name=ATTR_ENERGY_TO_USER_TODAY, register=3075, value_type=float, length=2
-
     ),
-
     GrowattDeviceRegisters(
-
         name=ATTR_ENERGY_TO_USER_TOTAL, register=3077, value_type=float, length=2
-
     ),
-
     GrowattDeviceRegisters(
-
         name=ATTR_ENERGY_TO_GRID_TODAY, register=3071, value_type=float, length=2
-
     ),
-
     GrowattDeviceRegisters(
-
         name=ATTR_ENERGY_TO_GRID_TOTAL, register=3073, value_type=float, length=2
-
     ),
-
     GrowattDeviceRegisters(
-
         name=ATTR_DISCHARGE_ENERGY_TODAY, register=3125, value_type=float, length=2
-
     ),
-
     GrowattDeviceRegisters(
-
         name=ATTR_DISCHARGE_ENERGY_TOTAL, register=3127, value_type=float, length=2
-
     ),
-
     GrowattDeviceRegisters(
-
         name=ATTR_CHARGE_ENERGY_TODAY, register=3129, value_type=float, length=2
-
     ),
-
     GrowattDeviceRegisters(
-
         name=ATTR_CHARGE_ENERGY_TOTAL, register=3131, value_type=float, length=2
-
     ),
-    GrowattDeviceRegisters(
-
-        name=ATTR_AC_CHARGE_ENABLED, register=3049, value_type=int, length=1
-
-    ),
-
 )
