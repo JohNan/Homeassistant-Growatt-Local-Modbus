@@ -126,7 +126,7 @@ HOLDING_REGISTERS_124: tuple[GrowattDeviceRegisters, ...] = (
     ),
     GrowattDeviceRegisters(
         name=ATTR_AC_CHARGE_ENABLED,
-        register=1092,
+        register=3049,
         value_type=int,
         length=1
     ),
