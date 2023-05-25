@@ -337,7 +337,7 @@ class GrowattDevice:
 
         for item in key_sequences:
             register_values.update(
-                await self.modbus.read_input_registers(start_index=item[0], length=item[1], unit=self.unit)
+                await self.modbus.read_holding_registers(start_index=item[0], length=item[1], unit=self.unit)
             )
 
         return process_registers(self.holding_register, register_values)
