@@ -127,6 +127,15 @@ class GrowattDeviceEntity(CoordinatorEntity, RestoreEntity, SwitchEntity):
 
         _LOGGER.debug("Device type %s state %s", self._attr_unique_id, state)
         self._attr_is_on = state == "1"
+        value = int(state) 
+
+        if value == self._state_on: 
+
+           self._attr_is_on = True 
+
+        elif value == self._state_off: 
+
+           self._attr_is_on = False
         self.async_write_ha_state()
 
     @callback
@@ -137,5 +146,14 @@ class GrowattDeviceEntity(CoordinatorEntity, RestoreEntity, SwitchEntity):
             return
 
         _LOGGER.debug("Device type %s state %s", self._attr_unique_id, state)
-        self._attr_is_on = state == "1"
+       # self._attr_is_on = state == "1"
+        value = int(state) 
+
+        if value == self._state_on: 
+
+           self._attr_is_on = True 
+
+        elif value == self._state_off: 
+
+           self._attr_is_on = False
         self.async_write_ha_state()
