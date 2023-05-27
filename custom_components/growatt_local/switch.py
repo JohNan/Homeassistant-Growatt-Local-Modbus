@@ -8,6 +8,7 @@ from homeassistant.const import (
     CONF_MODEL,
     CONF_NAME,
     CONF_TYPE,
+    STATE_ON
 )
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.entity import DeviceInfo
@@ -106,12 +107,10 @@ class GrowattDeviceEntity(CoordinatorEntity, RestoreEntity, SwitchEntity):
     async def async_added_to_hass(self) -> None:
         """Call when entity is about to be added to Home Assistant."""
         await super().async_added_to_hass()
-        if (state := await self.async_get_last_state()) is None:
-            return
+        if state := await self.async_get_last_state(): 
 
-        value = int(state.state) 
+           self._attr_is_on = state.state == STATE_ON
 
-        self._attr_is_on = value == 1
 
     @callback
     def _handle_coordinator_update(self) -> None:
