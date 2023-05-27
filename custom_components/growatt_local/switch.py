@@ -8,7 +8,7 @@ from homeassistant.const import (
     CONF_MODEL,
     CONF_NAME,
     CONF_TYPE,
-    STATE_ON
+    STATE_ON,
 )
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.entity import DeviceInfo
