@@ -101,6 +101,7 @@ class GrowattDeviceEntity(CoordinatorEntity, RestoreEntity, SwitchEntity):
         register = self.coordinator.get_holding_register_by_name(self.entity_description.key)
         _LOGGER.debug("Device type %s key %s and register %d", self._attr_unique_id, register.name, register.register)
         await self.coordinator.write_register(register.register, 0)
+        await self.coordinator.force_refresh()
 
     async def async_added_to_hass(self) -> None:
         """Call when entity is about to be added to Home Assistant."""
