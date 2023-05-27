@@ -109,7 +109,7 @@ class GrowattDeviceEntity(CoordinatorEntity, RestoreEntity, SwitchEntity):
         if (state := await self.async_get_last_state()) is None:
             return
 
-        value = int(state) 
+        value = int(state.state) 
 
         self._attr_is_on = value == 1
 
