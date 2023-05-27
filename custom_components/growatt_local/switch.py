@@ -105,18 +105,12 @@ class GrowattDeviceEntity(CoordinatorEntity, RestoreEntity, SwitchEntity):
     async def async_added_to_hass(self) -> None:
         """Call when entity is about to be added to Home Assistant."""
         await super().async_added_to_hass()
-        #
-        # if self.entity_description.midnight_reset:
-        #     self.async_on_remove(
-        #         self.coordinator.async_add_midnight_listener(
-        #             self._handle_midnight_update, self.coordinator_context
-        #         )
-        #     )
-
         if (state := await self.async_get_last_state()) is None:
             return
 
-        self._attr_is_on = state.state == "1"
+        value = int(state) 
+
+        self._attr_is_on = value == 1
 
     @callback
     def _handle_coordinator_update(self) -> None:
@@ -126,16 +120,11 @@ class GrowattDeviceEntity(CoordinatorEntity, RestoreEntity, SwitchEntity):
             return
 
         _LOGGER.debug("Device type %s state %s", self._attr_unique_id, state)
-        self._attr_is_on = state == "1"
+
         value = int(state) 
 
-        if value == self._state_on: 
+        self._attr_is_on = value == 1
 
-           self._attr_is_on = True 
-
-        elif value == self._state_off: 
-
-           self._attr_is_on = False
         self.async_write_ha_state()
 
     @callback
@@ -146,14 +135,7 @@ class GrowattDeviceEntity(CoordinatorEntity, RestoreEntity, SwitchEntity):
             return
 
         _LOGGER.debug("Device type %s state %s", self._attr_unique_id, state)
-       # self._attr_is_on = state == "1"
         value = int(state) 
 
-        if value == self._state_on: 
-
-           self._attr_is_on = True 
-
-        elif value == self._state_off: 
-
-           self._attr_is_on = False
+        self._attr_is_on = value == 1
         self.async_write_ha_state()
