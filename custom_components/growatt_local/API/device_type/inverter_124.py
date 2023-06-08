@@ -335,10 +335,10 @@ INPUT_REGISTERS_124: tuple[GrowattDeviceRegisters, ...] = (
         name=ATTR_CHARGE_POWER, register=3180, value_type=float, length=2
     ),
     GrowattDeviceRegisters(
-        name=ATTR_ENERGY_TO_USER_TODAY, register=3075, value_type=float, length=2
+        name=ATTR_ENERGY_TO_USER_TODAY, register=3067, value_type=float, length=2
     ),
     GrowattDeviceRegisters(
-        name=ATTR_ENERGY_TO_USER_TOTAL, register=3077, value_type=float, length=2
+        name=ATTR_ENERGY_TO_USER_TOTAL, register=3069, value_type=float, length=2
     ),
     GrowattDeviceRegisters(
         name=ATTR_ENERGY_TO_GRID_TODAY, register=3071, value_type=float, length=2
