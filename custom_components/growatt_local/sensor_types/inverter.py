@@ -140,7 +140,6 @@ ATTR_CHARGE_ENERGY_TODAY = "charge_energy_today"  # kWh
 ATTR_CHARGE_ENERGY_TOTAL = "charge_energy_total"  # kWh
 ATTR_AC_CHARGE_ENABLED = "ac_charge_enabled"  # bool / binary
 
-
 INVERTER_SELECT_TYPES: tuple[GrowattSelectEntityDescription, ...] = (
     GrowattSelectEntityDescription(
         key=ATTR_AC_CHARGE_ENABLED,
@@ -582,97 +581,59 @@ INVERTER_SENSOR_TYPES: tuple[GrowattSensorEntityDescription, ...] = (
         midnight_reset=True
     ),
     GrowattSensorEntityDescription(
-
         key=ATTR_ENERGY_TO_USER_TOTAL,
-
         name="Energy To User (Total)",
-
         native_unit_of_measurement=ENERGY_KILO_WATT_HOUR,
-
         device_class=SensorDeviceClass.ENERGY,
-
         state_class=SensorStateClass.TOTAL_INCREASING,
-
     ),
 
     GrowattSensorEntityDescription(
-
         key=ATTR_ENERGY_TO_USER_TODAY,
-
         name="Energy To User (Today)",
-
         native_unit_of_measurement=ENERGY_KILO_WATT_HOUR,
-
         device_class=SensorDeviceClass.ENERGY,
-
         state_class=SensorStateClass.TOTAL_INCREASING,
-
         midnight_reset=True
-
     ),
     GrowattSensorEntityDescription(
         key=ATTR_AC_CHARGE_ENABLED,
         name="AC Charge Enabled"
     ),
     GrowattSensorEntityDescription(
-
-        ATTR_DISCHARGE_ENERGY_TODAY,
-
+        key=ATTR_DISCHARGE_ENERGY_TODAY,
         name="Battery Discharged (Today)",
-
         native_unit_of_measurement=ENERGY_KILO_WATT_HOUR,
-
         device_class=SensorDeviceClass.ENERGY,
-
         state_class=SensorStateClass.TOTAL_INCREASING,
-
         midnight_reset=True
-
     ),
     GrowattSensorEntityDescription(
-
-        ATTR_DISCHARGE_ENERGY_TOTAL,
-
+        key=ATTR_DISCHARGE_ENERGY_TOTAL,
         name="Battery Discharged (Total)",
-
         native_unit_of_measurement=ENERGY_KILO_WATT_HOUR,
-
         device_class=SensorDeviceClass.ENERGY,
-
         state_class=SensorStateClass.TOTAL_INCREASING,
-
-
-
     ),
     GrowattSensorEntityDescription(
-
         key=ATTR_CHARGE_ENERGY_TODAY,
-
         name="Battery Charged (Today)",
-
         native_unit_of_measurement=ENERGY_KILO_WATT_HOUR,
-
         device_class=SensorDeviceClass.ENERGY,
-
         state_class=SensorStateClass.TOTAL_INCREASING,
-
         midnight_reset=True
+    ),
+    GrowattSensorEntityDescription(
+        key=ATTR_CHARGE_ENERGY_TOTAL,
+        name="Battery Charged (Total)",
+        native_unit_of_measurement=ENERGY_KILO_WATT_HOUR,
+        device_class=SensorDeviceClass.ENERGY,
+        state_class=SensorStateClass.TOTAL_INCREASING,
 
     ),
     GrowattSensorEntityDescription(
-
-        key=ATTR_CHARGE_ENERGY_TOTAL,
-
-        name="Battery Charged (Total)",
-
-        native_unit_of_measurement=ENERGY_KILO_WATT_HOUR,
-
-        device_class=SensorDeviceClass.ENERGY,
-
-        state_class=SensorStateClass.TOTAL_INCREASING,
-
-        
-
+        key="status",
+        name="Status",
+        device_class=f"growatt_local__status"
     ),
-    GrowattSensorEntityDescription(key="status", name="Status", device_class=f"growatt_local__status"),
 )

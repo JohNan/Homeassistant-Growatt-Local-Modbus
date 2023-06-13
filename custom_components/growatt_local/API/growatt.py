@@ -3,23 +3,18 @@ Python wrapper for getting data asynchronously from Growatt inverters
 via serial usb RS232 connection and modbus RTU protocol.
 """
 import json
-from abc import abstractmethod
 import logging
 import os
 import sys
-import asyncio
-
-
+from abc import abstractmethod
+from collections.abc import Sequence
 from datetime import datetime, timedelta
 from typing import Any
-from collections.abc import Sequence, Set
-
 
 from pymodbus.client import ModbusBaseClient
 from pymodbus.client.serial import AsyncModbusSerialClient
 from pymodbus.client.tcp import AsyncModbusTcpClient
 from pymodbus.client.udp import AsyncModbusUdpClient
-
 from pymodbus.constants import Defaults, Endian
 from pymodbus.framer.rtu_framer import ModbusRtuFramer
 from pymodbus.payload import BinaryPayloadBuilder
@@ -40,12 +35,8 @@ from .device_type.base import (
     ATTR_STATUS_CODE,
     inverter_status,
 )
-from .device_type.inverter_120 import MAXIMUM_DATA_LENGTH_120, HOLDING_REGISTERS_120, INPUT_REGISTERS_120
 from .device_type.inverter_124 import MAXIMUM_DATA_LENGTH_124, INPUT_REGISTERS_124, HOLDING_REGISTERS_124
-from .device_type.inverter_315 import MAXIMUM_DATA_LENGTH_315, HOLDING_REGISTERS_315, INPUT_REGISTERS_315
-
 from .exception import ModbusException, ModbusPortException
-from .const import DeviceTypes
 from .utils import (
     get_keys_from_register,
     get_all_keys_from_register,
@@ -53,7 +44,6 @@ from .utils import (
     process_registers,
     LRUCache
 )
-
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -101,9 +91,9 @@ class GrowattModbusBase:
         results = process_registers(register, register_values)
 
         device_info = GrowattDeviceInfo(
-            serial_number=results[ATTR_SERIAL_NUMBER],
+            serial_number=results[ATTR_SERIAL_NUMBER].replace("\x00", ""),
             model=results[ATTR_INVERTER_MODEL],
-            firmware=results[ATTR_FIRMWARE],
+            firmware=results[ATTR_FIRMWARE].replace("\x00", ""),
             mppt_trackers=results[ATTR_NUMBER_OF_TRACKERS_AND_PHASES][0],
             grid_phases=results[ATTR_NUMBER_OF_TRACKERS_AND_PHASES][1],
             modbus_version=results[ATTR_MODBUS_VERSION],
@@ -132,7 +122,7 @@ class GrowattModbusBase:
         )
 
     async def write_device_time(
-        self, year: int, month: int, day: int, hour: int, minute: int, second: int
+            self, year: int, month: int, day: int, hour: int, minute: int, second: int
     ):
         """Writing current date/time to device."""
         # TODO: test if it works with current asyc libary
@@ -164,12 +154,12 @@ class GrowattModbusBase:
 
 class GrowattNetwork(GrowattModbusBase):
     def __init__(
-        self,
-        network_type: str,
-        host: str,
-        port: int = 502,
-        timeout: int = Defaults.Timeout,
-        retries: int = Defaults.Retries,
+            self,
+            network_type: str,
+            host: str,
+            port: int = 502,
+            timeout: int = Defaults.Timeout,
+            retries: int = Defaults.Retries,
     ) -> None:
         """Initialize Network Growatt."""
 
@@ -195,13 +185,13 @@ class GrowattNetwork(GrowattModbusBase):
 
 class GrowattSerial(GrowattModbusBase):
     def __init__(
-        self,
-        port: str,
-        baudrate: int = 9600,
-        stopbits: int = 1,
-        parity: str = "N",
-        bytesize: int = 8,
-        timeout: int = 3,
+            self,
+            port: str,
+            baudrate: int = 9600,
+            stopbits: int = 1,
+            parity: str = "N",
+            bytesize: int = 8,
+            timeout: int = 3,
     ) -> None:
         """Initialize Serial Growatt."""
 
@@ -235,39 +225,16 @@ class GrowattDevice:
     input_register: dict[int, GrowattDeviceRegisters] = {}
     max_length: int = 20
 
-    def __init__(
-        self,
-        GrowattModbusClient: GrowattModbusBase,
-        GrowattDeviceType: DeviceTypes,
-        unit: int,
-    ) -> None:
+    def __init__(self, GrowattModbusClient: GrowattModbusBase, unit: int) -> None:
         self.modbus = GrowattModbusClient
-        self.device = GrowattDeviceType
         self._input_cache = LRUCache(10)
-        if GrowattDeviceType in (DeviceTypes.INVERTER, DeviceTypes.INVERTER_315):
-            self.max_length = MAXIMUM_DATA_LENGTH_315
-            self.holding_register = {
-                obj.register: obj for obj in HOLDING_REGISTERS_315
-            }
-            self.input_register = {
-                obj.register: obj for obj in INPUT_REGISTERS_315
-            }
-        elif GrowattDeviceType == DeviceTypes.INVERTER_120:
-            self.max_length = MAXIMUM_DATA_LENGTH_120
-            self.holding_register = {
-                obj.register: obj for obj in HOLDING_REGISTERS_120
-            }
-            self.input_register = {
-                obj.register: obj for obj in INPUT_REGISTERS_120
-            }
-        elif GrowattDeviceType == DeviceTypes.INVERTER_124:
-            self.max_length = MAXIMUM_DATA_LENGTH_124
-            self.holding_register = {
-                obj.register: obj for obj in HOLDING_REGISTERS_124
-            }
-            self.input_register = {
-                obj.register: obj for obj in INPUT_REGISTERS_124
-            }
+        self.max_length = MAXIMUM_DATA_LENGTH_124
+        self.holding_register = {
+            obj.register: obj for obj in HOLDING_REGISTERS_124
+        }
+        self.input_register = {
+            obj.register: obj for obj in INPUT_REGISTERS_124
+        }
 
         self.unit = unit
 
@@ -386,8 +353,7 @@ class GrowattDevice:
         """
         Based on the various register values the status of the device can be determined.
         """
-        if self.device in (DeviceTypes.INVERTER, DeviceTypes.INVERTER_315, DeviceTypes.INVERTER_120, DeviceTypes.INVERTER_124):
-            return inverter_status(value)
+        return inverter_status(value)
 
     async def write_register(self, register, payload) -> ModbusResponse:
         _LOGGER.info("Write register %d with payload %d and unit %d", register, payload, self.unit)
@@ -397,12 +363,8 @@ class GrowattDevice:
 
     async def read_holding_register(self, registers: tuple[GrowattDeviceRegisters, ...]) -> dict[str, Any]:
         _LOGGER.info("Read holding registers")
-        minimal_length = min((MAXIMUM_DATA_LENGTH_120, MAXIMUM_DATA_LENGTH_315))
-
         register = {item.register: item for item in registers}
-
-        key_sequences = keys_sequences(get_keys_from_register(register), minimal_length)
-
+        key_sequences = keys_sequences(get_keys_from_register(register), MAXIMUM_DATA_LENGTH_124)
         register_values = {}
 
         for item in key_sequences:
@@ -415,36 +377,5 @@ class GrowattDevice:
         return results
 
 
-async def get_device_info(device: GrowattModbusBase, unit: int, fixed_device_types: DeviceTypes | None = None) -> GrowattDeviceInfo | None:
-    # Needs to determine minimal maximum length as all devices need to be able to support this
-    minimal_length = min((MAXIMUM_DATA_LENGTH_120, MAXIMUM_DATA_LENGTH_315))
-
-    if fixed_device_types is not None:
-        if fixed_device_types == DeviceTypes.INVERTER_120:
-            return await device.get_device_info(HOLDING_REGISTERS_120, minimal_length, unit)
-        elif fixed_device_types == DeviceTypes.INVERTER_315:
-            return await device.get_device_info(HOLDING_REGISTERS_315, minimal_length, unit)
-        elif fixed_device_types == DeviceTypes.INVERTER_124:
-            return await device.get_device_info(HOLDING_REGISTERS_124, minimal_length, unit)
-        else:
-            return None
-
-    _LOGGER.info(f"Detected the following device info")
-    inverter_v120 = await device.get_device_info(HOLDING_REGISTERS_120, minimal_length, unit)
-    _LOGGER.info(f"Inverter Protocol v1.20: {inverter_v120}")
-
-    inverter_v315 = await device.get_device_info(HOLDING_REGISTERS_315, minimal_length, unit)
-    _LOGGER.info(f"Inverter Protocol v3.15: {inverter_v315}")
-
-    inverter_v124 = await device.get_device_info(HOLDING_REGISTERS_124, minimal_length, unit)
-    _LOGGER.info(f"Inverter Protocol v1.24: {inverter_v124}") 
-
-    if 1.0 < inverter_v120.modbus_version < 1.20:
-        return inverter_v120
-    elif inverter_v124.modbus_version == 3.05:
-        return inverter_v124
-    elif 3.0 < inverter_v315.modbus_version < 3.15:
-        return inverter_v315
-    else:
-        _LOGGER.warning(f"Inverter Modbus version not default supported.")
-        return None
+async def get_device_info(device: GrowattModbusBase, unit: int) -> GrowattDeviceInfo | None:
+    return await device.get_device_info(HOLDING_REGISTERS_124, MAXIMUM_DATA_LENGTH_124, unit)

@@ -15,7 +15,6 @@ from homeassistant.helpers.restore_state import RestoreEntity
 from homeassistant.helpers.update_coordinator import (
     CoordinatorEntity,
 )
-from .API.const import DeviceTypes
 from .const import (
     CONF_FIRMWARE,
     CONF_SERIAL_NUMBER,
@@ -34,28 +33,15 @@ async def async_setup_entry(
     config_entry: ConfigEntry,
     async_add_entities: AddEntitiesCallback,
 ) -> None:
-
     coordinator = hass.data[DOMAIN][config_entry.data[CONF_SERIAL_NUMBER]]
-
     entities = []
     sensor_descriptions: list[GrowattSelectEntityDescription] = []
+    supported_key_names = coordinator.growatt_api.get_register_names()
 
-    device_type = DeviceTypes(config_entry.data[CONF_TYPE])
-
-    if device_type in (DeviceTypes.INVERTER, DeviceTypes.INVERTER_315, DeviceTypes.INVERTER_120, DeviceTypes.INVERTER_124):
-        supported_key_names = coordinator.growatt_api.get_register_names()
-
-        for sensor in INVERTER_SELECT_TYPES:
-            if sensor.key not in supported_key_names:
-                continue
-
-            sensor_descriptions.append(sensor)
-
-    else:
-        _LOGGER.debug(
-            "Device type %s was found but is not supported right now",
-            config_entry.data[CONF_TYPE],
-        )
+    for sensor in INVERTER_SELECT_TYPES:
+        if sensor.key not in supported_key_names:
+            continue
+        sensor_descriptions.append(sensor)
 
     coordinator.get_keys_by_name({sensor.key for sensor in sensor_descriptions}, True)
 

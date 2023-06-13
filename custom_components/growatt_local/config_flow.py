@@ -1,33 +1,26 @@
 """Config flow for growatt server integration."""
 import asyncio
 import logging
-import traceback
 from asyncio.exceptions import TimeoutError
 from typing import Any
-import voluptuous as vol
 
+import voluptuous as vol
 from pymodbus.exceptions import ConnectionException
 
 from homeassistant import config_entries
-
 from homeassistant.const import (
     CONF_IP_ADDRESS,
     CONF_NAME,
     CONF_PORT,
     CONF_ADDRESS,
-    CONF_TYPE,
     CONF_SCAN_INTERVAL,
     CONF_MODEL,
 )
 from homeassistant.core import callback
 from homeassistant.data_entry_flow import FlowResult
 from homeassistant.helpers import selector
-
-from .API.const import DeviceTypes
 from .API.exception import ModbusPortException
 from .API.growatt import GrowattModbusBase, GrowattSerial, GrowattNetwork, get_device_info
-from .API.device_type.base import GrowattDeviceInfo
-
 from .const import (
     CONF_AC_PHASES,
     CONF_DC_STRING,
@@ -54,12 +47,6 @@ PARITY_OPTION = [
     selector.SelectOptionDict(value=ParityOptions.ODD, label=ParityOptions.ODD),
     selector.SelectOptionDict(value=ParityOptions.MARK, label=ParityOptions.MARK),
     selector.SelectOptionDict(value=ParityOptions.SPACE, label=ParityOptions.SPACE),
-]
-
-DEVICETYPES_OPTION = [
-    selector.SelectOptionDict(value=DeviceTypes.INVERTER_120, label="Inverter Protocol version 1.20"),
-    selector.SelectOptionDict(value=DeviceTypes.INVERTER_124, label="Inverter Protocol version 1.24"),
-    selector.SelectOptionDict(value=DeviceTypes.INVERTER_315, label="Inverter Protocol version 3.05-3.15"),
 ]
 
 _LOGGER = logging.getLogger(__name__)
@@ -146,7 +133,6 @@ class GrowattLocalConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         self,
         name: str = "",
         model: str = "",
-        device_type: str = DeviceTypes.INVERTER_120,
         mppt_trackers: int = 1,
         grid_phases: int = 1,
         modbus_version: float | str = "Not supported, Check logs for device info",
@@ -160,12 +146,7 @@ class GrowattLocalConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         data_schema = vol.Schema(
             {
                 vol.Required(CONF_NAME, default=name): str,
-                vol.Required(CONF_MODEL, default=model): str,
-                vol.Required(CONF_TYPE, default=device_type,): selector.SelectSelector(
-                    selector.SelectSelectorConfig(
-                        options=DEVICETYPES_OPTION
-                    ),
-                ),
+                vol.Required(CONF_MODEL, default=detected_type): str,
                 vol.Required(CONF_DC_STRING, default=mppt_trackers): selector.NumberSelector(
                     selector.NumberSelectorConfig(
                         min=1,
@@ -282,7 +263,6 @@ class GrowattLocalConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             if device_info:
                 return self._async_show_device_form(
                     model=device_info.model,
-                    device_type=device_info.device_type,
                     mppt_trackers=device_info.mppt_trackers,
                     grid_phases=device_info.grid_phases,
                     modbus_version=device_info.modbus_version,
@@ -372,7 +352,6 @@ class GrowattLocalConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             if device_info:
                 return self._async_show_device_form(
                     model=device_info.model,
-                    device_type=device_info.device_type,
                     mppt_trackers=device_info.mppt_trackers,
                     grid_phases=device_info.grid_phases,
                     modbus_version=device_info.modbus_version,
@@ -392,7 +371,7 @@ class GrowattLocalConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             await self.server.connect()
             try:
                 device_info = await get_device_info(
-                    self.server, self.data[CONF_ADDRESS], user_input[CONF_TYPE]
+                    self.server, self.data[CONF_ADDRESS]
                 )
             except TimeoutError:
                 _LOGGER.warning(
@@ -402,7 +381,6 @@ class GrowattLocalConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 return self._async_show_device_form(
                     name=user_input[CONF_NAME],
                     model=user_input[CONF_MODEL],
-                    device_type=user_input[CONF_TYPE],
                     mppt_trackers=user_input[CONF_DC_STRING],
                     grid_phases=user_input[CONF_AC_PHASES],
                     scan_interval=user_input[CONF_SCAN_INTERVAL],
@@ -417,7 +395,6 @@ class GrowattLocalConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 return self._async_show_device_form(
                     name=user_input[CONF_NAME],
                     model=user_input[CONF_MODEL],
-                    device_type=user_input[CONF_TYPE],
                     mppt_trackers=user_input[CONF_DC_STRING],
                     grid_phases=user_input[CONF_AC_PHASES],
                     scan_interval=user_input[CONF_SCAN_INTERVAL],
@@ -432,7 +409,6 @@ class GrowattLocalConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             return self._async_show_device_form(
                 name=user_input[CONF_NAME],
                 model=user_input[CONF_MODEL],
-                device_type=user_input[CONF_TYPE],
                 mppt_trackers=user_input[CONF_DC_STRING],
                 grid_phases=user_input[CONF_AC_PHASES],
                 scan_interval=user_input[CONF_SCAN_INTERVAL],

@@ -3,7 +3,6 @@ from datetime import timedelta
 import logging
 import re
 
-
 from homeassistant.components.sensor import SensorEntity
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant, callback
@@ -13,15 +12,12 @@ from homeassistant.helpers.restore_state import RestoreEntity
 from homeassistant.const import (
     CONF_MODEL,
     CONF_NAME,
-    CONF_TYPE,
 )
-
 
 from homeassistant.helpers.update_coordinator import (
     CoordinatorEntity,
 )
 
-from .API.const import DeviceTypes
 from .API.device_type.base import (
     ATTR_INPUT_POWER,
     ATTR_OUTPUT_POWER,
@@ -47,46 +43,34 @@ SCAN_INTERVAL = timedelta(minutes=1)
 
 
 async def async_setup_entry(
-    hass: HomeAssistant,
-    config_entry: ConfigEntry,
-    async_add_entities: AddEntitiesCallback,
+        hass: HomeAssistant,
+        config_entry: ConfigEntry,
+        async_add_entities: AddEntitiesCallback,
 ) -> None:
-
     coordinator = hass.data[DOMAIN][config_entry.data[CONF_SERIAL_NUMBER]]
-
     entities = []
-    power_sensor = []
     sensor_descriptions: list[GrowattSensorEntityDescription] = []
+    supported_key_names = coordinator.growatt_api.get_register_names()
 
-    device_type = DeviceTypes(config_entry.data[CONF_TYPE])
+    for sensor in INVERTER_SENSOR_TYPES:
+        if sensor.key not in supported_key_names:
+            continue
 
-    if device_type in (DeviceTypes.INVERTER, DeviceTypes.INVERTER_315, DeviceTypes.INVERTER_120, DeviceTypes.INVERTER_124):
-        supported_key_names = coordinator.growatt_api.get_register_names()
+        if re.match(r"input_\d+", sensor.key) and not re.match(f"input_[1-{config_entry.data[CONF_DC_STRING]}]",
+                                                               sensor.key):
+            continue
+        elif re.match(r"output_\d+", sensor.key) and not re.match(f"output_[1-{config_entry.data[CONF_AC_PHASES]}]",
+                                                                  sensor.key):
+            continue
 
-        for sensor in INVERTER_SENSOR_TYPES:
-            if sensor.key not in supported_key_names:
-                continue
+        sensor_descriptions.append(sensor)
 
-            if re.match(r"input_\d+", sensor.key) and not re.match(f"input_[1-{config_entry.data[CONF_DC_STRING]}]", sensor.key):
-                continue
-            elif re.match(r"output_\d+", sensor.key) and not re.match(f"output_[1-{config_entry.data[CONF_AC_PHASES]}]", sensor.key):
-                continue
-
-            sensor_descriptions.append(sensor)
-
-        power_sensor = (ATTR_INPUT_POWER, ATTR_OUTPUT_POWER, ATTR_SOC_PERCENTAGE, ATTR_DISCHARGE_POWER, ATTR_CHARGE_POWER)
-
-    else:
-        _LOGGER.debug(
-            "Device type %s was found but is not supported right now",
-            config_entry.data[CONF_TYPE],
-        )
+    power_sensor = (ATTR_INPUT_POWER, ATTR_OUTPUT_POWER, ATTR_SOC_PERCENTAGE, ATTR_DISCHARGE_POWER, ATTR_CHARGE_POWER)
 
     coordinator.get_keys_by_name({sensor.key for sensor in sensor_descriptions}, True)
 
     if config_entry.data[CONF_POWER_SCAN_ENABLED]:
         power_keys = coordinator.get_keys_by_name(power_sensor)
-
         coordinator.p_keys.update(power_keys)
 
     entities.extend(
@@ -108,9 +92,8 @@ class GrowattDeviceEntity(CoordinatorEntity, RestoreEntity, SensorEntity):
         """Pass coordinator to CoordinatorEntity."""
         super().__init__(coordinator, description.key)
         self.entity_description = description
-        self._attr_unique_id = (
-            f"{DOMAIN}_{entry.data[CONF_SERIAL_NUMBER]}_{description.key}"
-        )
+        self.entity_id = f"{DOMAIN}_{entry.data[CONF_NAME]}_{description.key}".lower()
+        self._attr_unique_id = f"{DOMAIN}_{entry.data[CONF_SERIAL_NUMBER]}_{description.key}"
 
         self._attr_device_info = DeviceInfo(
             identifiers={(DOMAIN, entry.data[CONF_SERIAL_NUMBER])},

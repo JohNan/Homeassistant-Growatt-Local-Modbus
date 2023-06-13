@@ -52,7 +52,6 @@ from .const import (
     PLATFORMS,
 )
 
-from .API.const import DeviceTypes
 from .API.growatt import GrowattDevice, GrowattSerial, GrowattNetwork
 
 
@@ -86,7 +85,7 @@ async def async_setup_entry(
         return False
 
     device = GrowattDevice(
-        device_layer, DeviceTypes(entry.data[CONF_TYPE]), entry.data[CONF_ADDRESS]
+        device_layer, entry.data[CONF_ADDRESS]
     )
 
     await device.connect()

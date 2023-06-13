@@ -120,6 +120,7 @@ ATTR_CHARGE_ENERGY_TODAY = "charge_energy_today"  # kWh
 ATTR_CHARGE_ENERGY_TOTAL = "charge_energy_total"  # kWh
 ATTR_AC_CHARGE_ENABLED = "ac_charge_enabled"
 
+
 class custom_function(type):
     """
     Object to be used as value_type in a `GrowattDeviceRegisters` that require custom function to translate the register value.
@@ -178,7 +179,7 @@ def device_type(register) -> str:
         return DEVICE_TYPE_CODES.get(register, not_defined)
 
     return DEVICE_TYPE_CODES.get(register & 0xFF00, not_defined)
-    
+
 
 def trackers_and_phases(register) -> tuple[int, int]:
     # number of mppt trackers high byte, grid phases low byte 

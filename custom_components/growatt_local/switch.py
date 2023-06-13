@@ -7,7 +7,6 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import (
     CONF_MODEL,
     CONF_NAME,
-    CONF_TYPE,
     STATE_ON,
 )
 from homeassistant.core import HomeAssistant, callback
@@ -17,7 +16,6 @@ from homeassistant.helpers.restore_state import RestoreEntity
 from homeassistant.helpers.update_coordinator import (
     CoordinatorEntity,
 )
-from .API.const import DeviceTypes
 from .const import (
     CONF_FIRMWARE,
     CONF_SERIAL_NUMBER,
@@ -33,32 +31,19 @@ SCAN_INTERVAL = timedelta(minutes=1)
 
 
 async def async_setup_entry(
-    hass: HomeAssistant,
-    config_entry: ConfigEntry,
-    async_add_entities: AddEntitiesCallback,
+        hass: HomeAssistant,
+        config_entry: ConfigEntry,
+        async_add_entities: AddEntitiesCallback,
 ) -> None:
-
     coordinator = hass.data[DOMAIN][config_entry.data[CONF_SERIAL_NUMBER]]
-
     entities = []
     sensor_descriptions: list[GrowattSwitchEntityDescription] = []
+    supported_key_names = coordinator.growatt_api.get_holding_register_names()
 
-    device_type = DeviceTypes(config_entry.data[CONF_TYPE])
-
-    if device_type in (DeviceTypes.INVERTER, DeviceTypes.INVERTER_315, DeviceTypes.INVERTER_120, DeviceTypes.INVERTER_124):
-        supported_key_names = coordinator.growatt_api.get_holding_register_names()
-
-        for sensor in INVERTER_SWITCH_TYPES:
-            if sensor.key not in supported_key_names:
-                continue
-
-            sensor_descriptions.append(sensor)
-
-    else:
-        _LOGGER.debug(
-            "Device type %s was found but is not supported right now",
-            config_entry.data[CONF_TYPE],
-        )
+    for sensor in INVERTER_SWITCH_TYPES:
+        if sensor.key not in supported_key_names:
+            continue
+        sensor_descriptions.append(sensor)
 
     coordinator.get_holding_keys_by_name({sensor.key for sensor in sensor_descriptions}, True)
 
@@ -107,10 +92,8 @@ class GrowattDeviceEntity(CoordinatorEntity, RestoreEntity, SwitchEntity):
     async def async_added_to_hass(self) -> None:
         """Call when entity is about to be added to Home Assistant."""
         await super().async_added_to_hass()
-        if state := await self.async_get_last_state(): 
-
-           self._attr_is_on = state.state == STATE_ON
-
+        if state := await self.async_get_last_state():
+            self._attr_is_on = state.state == STATE_ON
 
     @callback
     def _handle_coordinator_update(self) -> None:
@@ -121,7 +104,7 @@ class GrowattDeviceEntity(CoordinatorEntity, RestoreEntity, SwitchEntity):
 
         _LOGGER.debug("Device type %s state %s", self._attr_unique_id, state)
 
-        value = int(state) 
+        value = int(state)
 
         self._attr_is_on = value == 1
 
@@ -135,7 +118,7 @@ class GrowattDeviceEntity(CoordinatorEntity, RestoreEntity, SwitchEntity):
             return
 
         _LOGGER.debug("Device type %s state %s", self._attr_unique_id, state)
-        value = int(state) 
+        value = int(state)
 
         self._attr_is_on = value == 1
         self.async_write_ha_state()
