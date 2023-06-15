@@ -35,7 +35,7 @@ from .device_type.base import (
     ATTR_STATUS_CODE,
     inverter_status,
 )
-from .device_type.inverter_124 import MAXIMUM_DATA_LENGTH_124, INPUT_REGISTERS_124, HOLDING_REGISTERS_124
+from .device_type.inverter import MAXIMUM_DATA_LENGTH, INPUT_REGISTERS, HOLDING_REGISTERS
 from .exception import ModbusException, ModbusPortException
 from .utils import (
     get_keys_from_register,
@@ -228,12 +228,12 @@ class GrowattDevice:
     def __init__(self, GrowattModbusClient: GrowattModbusBase, unit: int) -> None:
         self.modbus = GrowattModbusClient
         self._input_cache = LRUCache(10)
-        self.max_length = MAXIMUM_DATA_LENGTH_124
+        self.max_length = MAXIMUM_DATA_LENGTH
         self.holding_register = {
-            obj.register: obj for obj in HOLDING_REGISTERS_124
+            obj.register: obj for obj in HOLDING_REGISTERS
         }
         self.input_register = {
-            obj.register: obj for obj in INPUT_REGISTERS_124
+            obj.register: obj for obj in INPUT_REGISTERS
         }
 
         self.unit = unit
@@ -364,7 +364,7 @@ class GrowattDevice:
     async def read_holding_register(self, registers: tuple[GrowattDeviceRegisters, ...]) -> dict[str, Any]:
         _LOGGER.info("Read holding registers")
         register = {item.register: item for item in registers}
-        key_sequences = keys_sequences(get_keys_from_register(register), MAXIMUM_DATA_LENGTH_124)
+        key_sequences = keys_sequences(get_keys_from_register(register), MAXIMUM_DATA_LENGTH)
         register_values = {}
 
         for item in key_sequences:
@@ -378,4 +378,4 @@ class GrowattDevice:
 
 
 async def get_device_info(device: GrowattModbusBase, unit: int) -> GrowattDeviceInfo | None:
-    return await device.get_device_info(HOLDING_REGISTERS_124, MAXIMUM_DATA_LENGTH_124, unit)
+    return await device.get_device_info(HOLDING_REGISTERS, MAXIMUM_DATA_LENGTH, unit)

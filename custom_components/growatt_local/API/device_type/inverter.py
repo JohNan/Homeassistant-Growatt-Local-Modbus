@@ -83,7 +83,7 @@ from .base import (
     ATTR_CHARGE_ENERGY_TODAY, ATTR_CHARGE_ENERGY_TOTAL, ATTR_AC_CHARGE_ENABLED, ATTR_SERIAL_NUMBER,
 )
 
-MAXIMUM_DATA_LENGTH_124 = 100
+MAXIMUM_DATA_LENGTH = 100
 
 
 def model(registers) -> str:
@@ -100,13 +100,13 @@ def model(registers) -> str:
     )
 
 
-SERIAL_NUMBER_REGISTER_124 = GrowattDeviceRegisters(
+SERIAL_NUMBER_REGISTER = GrowattDeviceRegisters(
     name=ATTR_SERIAL_NUMBER, register=3001, value_type=str, length=15
 )
 
-HOLDING_REGISTERS_124: tuple[GrowattDeviceRegisters, ...] = (
+HOLDING_REGISTERS: tuple[GrowattDeviceRegisters, ...] = (
     FIRMWARE_REGISTER,
-    SERIAL_NUMBER_REGISTER_124,
+    SERIAL_NUMBER_REGISTER,
     GrowattDeviceRegisters(
         name=ATTR_INVERTER_MODEL,
         register=28,
@@ -130,7 +130,7 @@ HOLDING_REGISTERS_124: tuple[GrowattDeviceRegisters, ...] = (
     ),
 )
 
-INPUT_REGISTERS_124: tuple[GrowattDeviceRegisters, ...] = (
+INPUT_REGISTERS: tuple[GrowattDeviceRegisters, ...] = (
     GrowattDeviceRegisters(
         name=ATTR_STATUS_CODE, register=0, value_type=int
     ),

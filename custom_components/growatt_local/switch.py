@@ -1,6 +1,6 @@
 import logging
 from datetime import timedelta
-from typing import Any
+from typing import Any, Optional
 
 from homeassistant.components.switch import SwitchEntity
 from homeassistant.config_entries import ConfigEntry
@@ -22,7 +22,6 @@ from .const import (
     DOMAIN,
 )
 from .sensor_types.inverter import INVERTER_SWITCH_TYPES
-from .sensor_types.select_entity_description import GrowattSelectEntityDescription
 from .sensor_types.switch_entity_description import GrowattSwitchEntityDescription
 
 _LOGGER = logging.getLogger(__name__)
@@ -66,9 +65,7 @@ class GrowattDeviceEntity(CoordinatorEntity, RestoreEntity, SwitchEntity):
         """Pass coordinator to CoordinatorEntity."""
         super().__init__(coordinator, description.key)
         self.entity_description: GrowattSelectEntityDescription = description
-        self._attr_unique_id = (
-            f"{DOMAIN}_{entry.data[CONF_SERIAL_NUMBER]}_{description.key}"
-        )
+        self._config_entry = entry
 
         self._attr_device_info = DeviceInfo(
             identifiers={(DOMAIN, entry.data[CONF_SERIAL_NUMBER])},
@@ -77,6 +74,14 @@ class GrowattDeviceEntity(CoordinatorEntity, RestoreEntity, SwitchEntity):
             sw_version=entry.data[CONF_FIRMWARE],
             name=entry.data[CONF_NAME],
         )
+
+    @property
+    def name(self):
+        return f"{self._config_entry.data[CONF_NAME]} {self.entity_description.name}"
+
+    @property
+    def unique_id(self) -> Optional[str]:
+        return f"{DOMAIN}_{self._config_entry.data[CONF_SERIAL_NUMBER]}_{self.entity_description.key}"
 
     async def async_turn_on(self, **kwargs: Any) -> None:
         register = self.coordinator.get_holding_register_by_name(self.entity_description.key)

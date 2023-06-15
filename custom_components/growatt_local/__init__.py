@@ -1,40 +1,35 @@
 """The Growatt server PV inverter sensor integration."""
 import asyncio
-from datetime import date, timedelta
 import logging
 from collections.abc import Callable, Sequence
+from datetime import timedelta
 from typing import Any, Optional
 
 from pymodbus.exceptions import ConnectionException
 
 from homeassistant import config_entries
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.core import CALLBACK_TYPE, HomeAssistant, callback
-from homeassistant.helpers.sun import get_astral_event_next
-from homeassistant.util import dt as dt_util
 from homeassistant.const import (
     CONF_ADDRESS,
     CONF_IP_ADDRESS,
-    CONF_MODEL,
     CONF_PORT,
     CONF_SCAN_INTERVAL,
-    CONF_TYPE,
     SUN_EVENT_SUNRISE,
     SUN_EVENT_SUNSET,
 )
-
+from homeassistant.core import CALLBACK_TYPE, HomeAssistant, callback
 from homeassistant.helpers.event import (
     async_track_sunrise,
     async_track_sunset,
     async_track_time_change,
 )
-
+from homeassistant.helpers.sun import get_astral_event_next
 from homeassistant.helpers.update_coordinator import (
     DataUpdateCoordinator,
-    UpdateFailed,
 )
+from homeassistant.util import dt as dt_util
 from .API.device_type.base import GrowattDeviceRegisters
-
+from .API.growatt import GrowattDevice, GrowattSerial, GrowattNetwork
 from .const import (
     CONF_LAYER,
     CONF_SERIAL,
@@ -51,9 +46,6 @@ from .const import (
     DOMAIN,
     PLATFORMS,
 )
-
-from .API.growatt import GrowattDevice, GrowattSerial, GrowattNetwork
-
 
 _LOGGER = logging.getLogger(__name__)
 

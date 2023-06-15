@@ -2,6 +2,7 @@ from datetime import timedelta
 
 import logging
 import re
+from typing import Optional
 
 from homeassistant.components.sensor import SensorEntity
 from homeassistant.config_entries import ConfigEntry
@@ -92,8 +93,7 @@ class GrowattDeviceEntity(CoordinatorEntity, RestoreEntity, SensorEntity):
         """Pass coordinator to CoordinatorEntity."""
         super().__init__(coordinator, description.key)
         self.entity_description = description
-        self.entity_id = f"{DOMAIN}_{entry.data[CONF_NAME]}_{description.key}".lower()
-        self._attr_unique_id = f"{DOMAIN}_{entry.data[CONF_SERIAL_NUMBER]}_{description.key}"
+        self._config_entry = entry
 
         self._attr_device_info = DeviceInfo(
             identifiers={(DOMAIN, entry.data[CONF_SERIAL_NUMBER])},
@@ -102,6 +102,14 @@ class GrowattDeviceEntity(CoordinatorEntity, RestoreEntity, SensorEntity):
             sw_version=entry.data[CONF_FIRMWARE],
             name=entry.data[CONF_NAME],
         )
+
+    @property
+    def name(self):
+        return f"{self._config_entry.data[CONF_NAME]} {self.entity_description.name}"
+
+    @property
+    def unique_id(self) -> Optional[str]:
+        return f"{DOMAIN}_{self._config_entry.data[CONF_SERIAL_NUMBER]}_{self.entity_description.key}"
 
     async def async_added_to_hass(self) -> None:
         """Call when entity is about to be added to Home Assistant."""

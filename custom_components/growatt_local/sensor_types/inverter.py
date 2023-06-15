@@ -15,7 +15,6 @@ from homeassistant.const import (
     TIME_HOURS,
     PERCENTAGE,
 )
-from .select_entity_description import GrowattSelectEntityDescription
 from .sensor_entity_description import GrowattSensorEntityDescription
 from .switch_entity_description import GrowattSwitchEntityDescription
 
@@ -139,17 +138,6 @@ ATTR_DISCHARGE_ENERGY_TOTAL = "discharge_energy_total"  # kWh
 ATTR_CHARGE_ENERGY_TODAY = "charge_energy_today"  # kWh
 ATTR_CHARGE_ENERGY_TOTAL = "charge_energy_total"  # kWh
 ATTR_AC_CHARGE_ENABLED = "ac_charge_enabled"  # bool / binary
-
-INVERTER_SELECT_TYPES: tuple[GrowattSelectEntityDescription, ...] = (
-    GrowattSelectEntityDescription(
-        key=ATTR_AC_CHARGE_ENABLED,
-        name="AC Charge",
-        options_dict={
-            0: "Disabled",
-            1: "Enabled"
-        }
-    ),
-)
 
 INVERTER_SWITCH_TYPES: tuple[GrowattSwitchEntityDescription, ...] = (
     GrowattSwitchEntityDescription(
