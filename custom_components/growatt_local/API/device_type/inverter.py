@@ -101,7 +101,6 @@ def model(registers) -> str:
 
 def timeX(registers) -> str:
     bits = bin(registers[0])[2:].zfill(16)  # Convert to binary string, zero-padded to 16 bits
-    values = parse_register_3038(bits)
     minutes = int(bits[0:8], 2)
     hour = int(bits[8:13], 2)
     priority = int(bits[13:15], 2)
