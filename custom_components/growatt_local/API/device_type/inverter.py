@@ -80,7 +80,7 @@ from .base import (
     ATTR_OUTPUT_PERCENTAGE,
     ATTR_SOC_PERCENTAGE, ATTR_DISCHARGE_POWER, ATTR_CHARGE_POWER, ATTR_ENERGY_TO_USER_TODAY, ATTR_ENERGY_TO_USER_TOTAL,
     ATTR_ENERGY_TO_GRID_TODAY, ATTR_ENERGY_TO_GRID_TOTAL, ATTR_DISCHARGE_ENERGY_TODAY, ATTR_DISCHARGE_ENERGY_TOTAL,
-    ATTR_CHARGE_ENERGY_TODAY, ATTR_CHARGE_ENERGY_TOTAL, ATTR_AC_CHARGE_ENABLED, ATTR_SERIAL_NUMBER,
+    ATTR_CHARGE_ENERGY_TODAY, ATTR_CHARGE_ENERGY_TOTAL, ATTR_AC_CHARGE_ENABLED, ATTR_SERIAL_NUMBER, ATTR_TIME_1,
 )
 
 MAXIMUM_DATA_LENGTH = 100
@@ -99,6 +99,40 @@ def model(registers) -> str:
         (mo & 0x0000000F)
     )
 
+def timeX(registers) -> str:
+    bits = bin(registers[0])[2:].zfill(16)  # Convert to binary string, zero-padded to 16 bits
+    values = parse_register_3038(bits)
+    minutes = int(bits[0:8], 2)
+    hour = int(bits[8:13], 2)
+    priority = int(bits[13:15], 2)
+    enabled = int(bits[15], 2)
+
+    priority_mapping = {
+        0: 'Load Priority',
+        1: 'Battery Priority',
+        2: 'Grid Priority'
+    }
+
+    enabled_mapping = {
+        0: 'Prohibited',
+        1: 'Enabled'
+    }
+
+    dictionary = {
+        'Minutes': minutes,
+        'Hour': hour,
+        'Priority': priority_mapping.get(priority, 'Unknown'),
+        'Enabled': enabled_mapping.get(enabled, 'Unknown')
+    }
+
+    converted = str()
+
+    # iterating over dictionary using a for loop
+    for key in dictionary:
+        converted += key + ": " + dictionary[key] + ", "
+
+    return converted
+
 
 SERIAL_NUMBER_REGISTER = GrowattDeviceRegisters(
     name=ATTR_SERIAL_NUMBER, register=3001, value_type=str, length=15
@@ -113,6 +147,13 @@ HOLDING_REGISTERS: tuple[GrowattDeviceRegisters, ...] = (
         value_type=custom_function,
         length=2,
         function=model
+    ),
+    GrowattDeviceRegisters(
+        name=ATTR_TIME_1,
+        register=3038,
+        value_type=custom_function,
+        length=1,
+        function=timeX
     ),
     DEVICE_TYPE_CODE_REGISTER,
     NUMBER_OF_TRACKERS_AND_PHASES_REGISTER,
