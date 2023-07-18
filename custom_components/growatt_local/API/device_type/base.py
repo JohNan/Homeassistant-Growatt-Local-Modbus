@@ -119,6 +119,7 @@ ATTR_DISCHARGE_ENERGY_TOTAL = "discharge_energy_total"  # kWh
 ATTR_CHARGE_ENERGY_TODAY = "charge_energy_today"  # kWh
 ATTR_CHARGE_ENERGY_TOTAL = "charge_energy_total"  # kWh
 ATTR_AC_CHARGE_ENABLED = "ac_charge_enabled"
+ATTR_TIME_1 = "time_1"
 
 
 class custom_function(type):
