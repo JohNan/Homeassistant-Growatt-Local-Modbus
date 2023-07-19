@@ -1,4 +1,5 @@
 """Device defaults for a Growatt Inverter."""
+import logging
 
 from .base import (
     GrowattDeviceRegisters,
@@ -84,7 +85,7 @@ from .base import (
 )
 
 MAXIMUM_DATA_LENGTH = 100
-
+_LOGGER = logging.getLogger(__name__)
 
 def model(registers) -> str:
     mo = (registers[0] << 16) + registers[1]
@@ -130,6 +131,7 @@ def timeX(registers) -> str:
     for key in dictionary:
         converted += key + ": " + dictionary[key] + ", "
 
+    _LOGGER.debug("time: %s", converted)
     return converted
 
 
