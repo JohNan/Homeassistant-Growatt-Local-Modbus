@@ -220,6 +220,7 @@ def process_registers(
             result[register.name] = bool(value)
 
         elif register.value_type == custom_function:
+            _LOGGER.debug("using custom function for %s", register.name)
             if register.function is None:
                 continue
 
