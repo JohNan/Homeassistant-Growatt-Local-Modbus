@@ -51,7 +51,7 @@ async def async_setup_entry(
     coordinator = hass.data[DOMAIN][config_entry.data[CONF_SERIAL_NUMBER]]
     entities = []
     sensor_descriptions: list[GrowattSensorEntityDescription] = []
-    supported_key_names = coordinator.growatt_api.get_register_names()
+    supported_key_names = coordinator.growatt_api.get_register_names().union(coordinator.growatt_api.get_holding_register_names())
 
     for sensor in INVERTER_SENSOR_TYPES:
         if sensor.key not in supported_key_names:
@@ -69,6 +69,7 @@ async def async_setup_entry(
     power_sensor = (ATTR_INPUT_POWER, ATTR_OUTPUT_POWER, ATTR_SOC_PERCENTAGE, ATTR_DISCHARGE_POWER, ATTR_CHARGE_POWER)
 
     coordinator.get_keys_by_name({sensor.key for sensor in sensor_descriptions}, True)
+    coordinator.get_holding_keys_by_name({sensor.key for sensor in sensor_descriptions}, True)
 
     if config_entry.data[CONF_POWER_SCAN_ENABLED]:
         power_keys = coordinator.get_keys_by_name(power_sensor)

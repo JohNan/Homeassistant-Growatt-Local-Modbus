@@ -1,5 +1,6 @@
 """Device defaults for a Growatt Inverter."""
 import logging
+import datetime
 
 from .base import (
     GrowattDeviceRegisters,
@@ -82,10 +83,12 @@ from .base import (
     ATTR_SOC_PERCENTAGE, ATTR_DISCHARGE_POWER, ATTR_CHARGE_POWER, ATTR_ENERGY_TO_USER_TODAY, ATTR_ENERGY_TO_USER_TOTAL,
     ATTR_ENERGY_TO_GRID_TODAY, ATTR_ENERGY_TO_GRID_TOTAL, ATTR_DISCHARGE_ENERGY_TODAY, ATTR_DISCHARGE_ENERGY_TOTAL,
     ATTR_CHARGE_ENERGY_TODAY, ATTR_CHARGE_ENERGY_TOTAL, ATTR_AC_CHARGE_ENABLED, ATTR_SERIAL_NUMBER, ATTR_TIME_1,
+    ATTR_TIME_2, ATTR_TIME_3, ATTR_TIME_4,
 )
 
 MAXIMUM_DATA_LENGTH = 100
 _LOGGER = logging.getLogger(__name__)
+
 
 def model(registers) -> str:
     mo = (registers[0] << 16) + registers[1]
@@ -100,39 +103,61 @@ def model(registers) -> str:
         (mo & 0x0000000F)
     )
 
+
 def timeX(registers) -> str:
-    bits = bin(registers[0])[2:].zfill(16)  # Convert to binary string, zero-padded to 16 bits
-    minutes = int(bits[0:8], 2)
-    hour = int(bits[8:13], 2)
-    priority = int(bits[13:15], 2)
-    enabled = int(bits[15], 2)
-
-    priority_mapping = {
-        0: 'Load Priority',
-        1: 'Battery Priority',
-        2: 'Grid Priority'
-    }
-
-    enabled_mapping = {
-        0: 'Prohibited',
-        1: 'Enabled'
-    }
+    start = timeX_start(registers[0])
+    end = timeX_end(registers[1])
 
     dictionary = {
-        'Minutes': minutes,
-        'Hour': hour,
-        'Priority': priority_mapping.get(priority, 'Unknown'),
-        'Enabled': enabled_mapping.get(enabled, 'Unknown')
+        'Start': datetime.time(start['Hour'], start['Minutes']).isoformat(timespec='minutes'),
+        'End': datetime.time(end['Hour'], end['Minutes']).isoformat(timespec='minutes'),
+        'Priority': start['Priority'],
+        'Enabled': start['Enabled']
     }
 
     converted = str()
 
     # iterating over dictionary using a for loop
     for key in dictionary:
-        converted += key + ": " + dictionary[key] + ", "
+        converted += key + ": " + str(dictionary[key]) + ", "
 
     _LOGGER.debug("time: %s", converted)
     return converted
+
+
+def timeX_start(registers) -> dict:
+    bits = bin(registers)[2:].zfill(16)  # Convert to binary string, zero-padded to 16 bits
+    minutes = int(bits[9:15], 2)
+    hour = int(bits[4:8], 2)
+    priority = int(bits[1:3], 2)
+    enabled = int(bits[0], 2)
+    priority_mapping = {
+        0: 'Load',
+        1: 'Battery',
+        2: 'Grid'
+    }
+    enabled_mapping = {
+        0: 'No',
+        1: 'Yes'
+    }
+    dictionary = {
+        'Minutes': minutes,
+        'Hour': hour,
+        'Priority': priority_mapping.get(priority, 'Unknown'),
+        'Enabled': enabled_mapping.get(enabled, 'Unknown')
+    }
+    return dictionary
+
+
+def timeX_end(registers) -> dict:
+    bits = bin(registers)[2:].zfill(16)  # Convert to binary string, zero-padded to 16 bits
+    minutes = int(bits[9:15], 2)
+    hour = int(bits[3:8], 2)
+
+    return {
+        'Minutes': minutes,
+        'Hour': hour
+    }
 
 
 SERIAL_NUMBER_REGISTER = GrowattDeviceRegisters(
@@ -153,7 +178,28 @@ HOLDING_REGISTERS: tuple[GrowattDeviceRegisters, ...] = (
         name=ATTR_TIME_1,
         register=3038,
         value_type=custom_function,
-        length=1,
+        length=2,
+        function=timeX
+    ),
+    GrowattDeviceRegisters(
+        name=ATTR_TIME_2,
+        register=3040,
+        value_type=custom_function,
+        length=2,
+        function=timeX
+    ),
+    GrowattDeviceRegisters(
+        name=ATTR_TIME_3,
+        register=3042,
+        value_type=custom_function,
+        length=2,
+        function=timeX
+    ),
+    GrowattDeviceRegisters(
+        name=ATTR_TIME_4,
+        register=3044,
+        value_type=custom_function,
+        length=2,
         function=timeX
     ),
     DEVICE_TYPE_CODE_REGISTER,
