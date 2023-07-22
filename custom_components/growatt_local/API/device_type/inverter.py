@@ -83,7 +83,7 @@ from .base import (
     ATTR_SOC_PERCENTAGE, ATTR_DISCHARGE_POWER, ATTR_CHARGE_POWER, ATTR_ENERGY_TO_USER_TODAY, ATTR_ENERGY_TO_USER_TOTAL,
     ATTR_ENERGY_TO_GRID_TODAY, ATTR_ENERGY_TO_GRID_TOTAL, ATTR_DISCHARGE_ENERGY_TODAY, ATTR_DISCHARGE_ENERGY_TOTAL,
     ATTR_CHARGE_ENERGY_TODAY, ATTR_CHARGE_ENERGY_TOTAL, ATTR_AC_CHARGE_ENABLED, ATTR_SERIAL_NUMBER, ATTR_TIME_1,
-    ATTR_TIME_2, ATTR_TIME_3, ATTR_TIME_4,
+    ATTR_TIME_1_START, ATTR_TIME_2, ATTR_TIME_3, ATTR_TIME_4,
 )
 
 MAXIMUM_DATA_LENGTH = 100
@@ -159,6 +159,12 @@ def timeX_end(registers) -> dict:
         'Hour': hour
     }
 
+def time_x_start(registers) -> dict:
+    bits = bin(registers)[2:].zfill(16)
+    minutes = int(bits[9:15], 2)
+    hour = int(bits[4:8], 2)
+
+    return datetime.time(hour, minutes).isoformat(timespec='minutes'),
 
 SERIAL_NUMBER_REGISTER = GrowattDeviceRegisters(
     name=ATTR_SERIAL_NUMBER, register=3001, value_type=str, length=15
@@ -180,6 +186,13 @@ HOLDING_REGISTERS: tuple[GrowattDeviceRegisters, ...] = (
         value_type=custom_function,
         length=2,
         function=timeX
+    ),
+    GrowattDeviceRegisters(
+        name=ATTR_TIME_1_START,
+        register=3038,
+        value_type=custom_function,
+        length=1,
+        function=time_x_start
     ),
     GrowattDeviceRegisters(
         name=ATTR_TIME_2,
