@@ -139,6 +139,7 @@ ATTR_CHARGE_ENERGY_TODAY = "charge_energy_today"  # kWh
 ATTR_CHARGE_ENERGY_TOTAL = "charge_energy_total"  # kWh
 ATTR_AC_CHARGE_ENABLED = "ac_charge_enabled"  # bool / binary
 ATTR_TIME_1 = "time_1"
+ATTR_TIME_1_START = "time_1_start"
 ATTR_TIME_2 = "time_2"
 ATTR_TIME_3 = "time_3"
 ATTR_TIME_4 = "time_4"
@@ -595,6 +596,10 @@ INVERTER_SENSOR_TYPES: tuple[GrowattSensorEntityDescription, ...] = (
     GrowattSensorEntityDescription(
         key=ATTR_TIME_1,
         name="Time 1"
+    ),
+    GrowattSensorEntityDescription(
+        key=ATTR_TIME_1_START,
+        name="Time 1 Start"
     ),
     GrowattSensorEntityDescription(
         key=ATTR_TIME_2,
