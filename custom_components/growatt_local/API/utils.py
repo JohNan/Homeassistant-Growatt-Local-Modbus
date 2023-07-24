@@ -21,19 +21,19 @@ __all__ = ('LRUCache', 'get_keys_from_register', 'get_all_keys_from_register', '
 _LOGGER = logging.getLogger(__name__)
 
 
-def get_keys_from_register(register: dict[int, GrowattDeviceRegisters]) -> set[int]:
+def get_keys_from_register(register: tuple[GrowattDeviceRegisters, ...]) -> set[int]:
     results = set()
-    for key, value in register.items():
-        results.add(key)
+    for value in register:
+        results.add(value.key)
 
         if value.length > 1:
             for i in range(value.length):
-                results.add(key + i)
+                results.add(value.key + i)
 
     return results
 
 
-def get_all_keys_from_register(registers: dict[int, GrowattDeviceRegisters], keys: set[int]) -> set[int]:
+def get_all_keys_from_register(registers: tuple[GrowattDeviceRegisters, ...], keys: set[int]) -> set[int]:
     """
     Lookup all related keys from the given keys based on the register config.
     returns list a sorted list of all keys.
@@ -42,11 +42,11 @@ def get_all_keys_from_register(registers: dict[int, GrowattDeviceRegisters], key
 
     for key in keys:
         result.add(key)
-        if (register := registers.get(key)) is None:
+        if (register := [item for item in registers if item.register == key]) is None:
             continue
 
-        if register.length > 1:
-            for i in range(register.length):
+        if len(register) > 1:
+            for i in range(len(register)):
                 result.add(key + i)
 
     return result
@@ -179,25 +179,25 @@ def split_sequence(keys: list[int], maximum_length: int) -> list[int]:
 
 
 def process_registers(
-        registers: dict[int, GrowattDeviceRegisters],
+        registers: tuple[GrowattDeviceRegisters, ...],
         register_values: dict[int, int]
 ) -> dict[str, Any]:
     """
-    Processes the register value corisponding to the given register dict.
+    Processes the register value corresponding to the given register dict.
     returns a dict of name and value
     """
     result: dict[str, Any] = {}
 
-    for key, value in register_values.items():
+    for register in registers:
 
-        if (register := registers.get(key)) is None:
+        if (value := register_values.get(register.register)) is None:
             continue
 
         if register.value_type == int:
             result[register.name] = value
 
         elif register.value_type == float and register.length == 2:
-            if (second_value := register_values.get(key + 1, None)) is None:
+            if (second_value := register_values.get(register.register + 1, None)) is None:
                 continue
 
             result[register.name] = round(
@@ -209,7 +209,7 @@ def process_registers(
 
         elif register.value_type == str:
             string = ""
-            for i in range(key, key + register.length):
+            for i in range(register.register, register.register + register.length):
                 if (item := register_values.get(i)) is not None:
                     string += chr(item >> 8)
                     string += chr(item & 0x00FF)
@@ -228,7 +228,7 @@ def process_registers(
                 result[register.name] = register.function(value)
             else:
                 result[register.name] = register.function([
-                    register_values.get(i) for i in range(key, key + register.length)
+                    register_values.get(i) for i in range(register.register, register.register + register.length)
                 ])
 
     return result

@@ -68,16 +68,13 @@ class GrowattModbusBase:
 
     async def get_device_info(
             self,
-            register: dict[int, GrowattDeviceRegisters] | tuple[GrowattDeviceRegisters, ...],
+            register: tuple[GrowattDeviceRegisters, ...],
             max_length: int,
             unit: int
     ) -> GrowattDeviceInfo:
         """
         Read Growatt device information.
         """
-
-        if isinstance(register, tuple):
-            register = {item.register: item for item in register}
 
         key_sequences = keys_sequences(get_keys_from_register(register), max_length)
 
@@ -221,20 +218,16 @@ class GrowattSerial(GrowattModbusBase):
 
 
 class GrowattDevice:
-    holding_register: dict[int, GrowattDeviceRegisters] = {}
-    input_register: dict[int, GrowattDeviceRegisters] = {}
+    holding_register: tuple[GrowattDeviceRegisters, ...] = ()
+    input_register: tuple[GrowattDeviceRegisters, ...] = {}
     max_length: int = 20
 
     def __init__(self, GrowattModbusClient: GrowattModbusBase, unit: int) -> None:
         self.modbus = GrowattModbusClient
         self._input_cache = LRUCache(10)
         self.max_length = MAXIMUM_DATA_LENGTH
-        self.holding_register = {
-            obj.register: obj for obj in HOLDING_REGISTERS
-        }
-        self.input_register = {
-            obj.register: obj for obj in INPUT_REGISTERS
-        }
+        self.holding_register = HOLDING_REGISTERS
+        self.input_register = INPUT_REGISTERS
 
         self.unit = unit
 
@@ -314,39 +307,39 @@ class GrowattDevice:
             names = (*names, ATTR_STATUS_CODE, ATTR_FAULT_CODE, ATTR_DERATING_MODE)
 
         return {
-            key
-            for key, register in self.input_register.items()
+            register.register
+            for register in self.input_register
             if register.name in names
         }
 
     def get_holding_keys_by_name(self, names: Sequence[str]) -> set[int]:
         return {
-            key
-            for key, register in self.holding_register.items()
+            register.register
+            for register in self.holding_register
             if register.name in names
         }
 
     def get_register_by_name(self, name: str) -> GrowattDeviceRegisters:
-        for key, register in self.input_register.items():
+        for register in self.input_register:
             if register.name == name:
                 return register
 
         pass
 
     def get_holding_register_by_name(self, name: str) -> GrowattDeviceRegisters:
-        for key, register in self.holding_register.items():
+        for register in self.holding_register:
             if register.name == name:
                 return register
 
         pass
 
     def get_register_names(self) -> set[str]:
-        names = {register.name for register in self.input_register.values()}
+        names = {register.name for register in self.input_register}
         names.add(ATTR_STATUS)
         return names
 
     def get_holding_register_names(self) -> set[str]:
-        names = {register.name for register in self.holding_register.values()}
+        names = {register.name for register in self.holding_register}
         return names
 
     def status(self, value: dict[str, Any]):
@@ -363,8 +356,7 @@ class GrowattDevice:
 
     async def read_holding_register(self, registers: tuple[GrowattDeviceRegisters, ...]) -> dict[str, Any]:
         _LOGGER.info("Read holding registers")
-        register = {item.register: item for item in registers}
-        key_sequences = keys_sequences(get_keys_from_register(register), MAXIMUM_DATA_LENGTH)
+        key_sequences = keys_sequences(get_keys_from_register(registers), MAXIMUM_DATA_LENGTH)
         register_values = {}
 
         for item in key_sequences:
@@ -372,7 +364,7 @@ class GrowattDevice:
                 await self.modbus.read_holding_registers(start_index=item[0], length=item[1], unit=self.unit)
             )
 
-        results = process_registers(register, register_values)
+        results = process_registers(registers, register_values)
         _LOGGER.info("Read holding register response %s", json.dumps(results))
         return results
 
