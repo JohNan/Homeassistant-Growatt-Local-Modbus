@@ -15,7 +15,7 @@ from pymodbus.client import ModbusBaseClient
 from pymodbus.client.serial import AsyncModbusSerialClient
 from pymodbus.client.tcp import AsyncModbusTcpClient
 from pymodbus.client.udp import AsyncModbusUdpClient
-from pymodbus.constants import Defaults, Endian
+from pymodbus.constants import Endian
 from pymodbus.framer.rtu_framer import ModbusRtuFramer
 from pymodbus.payload import BinaryPayloadBuilder
 from pymodbus.pdu import ModbusResponse
@@ -155,15 +155,15 @@ class GrowattNetwork(GrowattModbusBase):
             network_type: str,
             host: str,
             port: int = 502,
-            timeout: int = Defaults.Timeout,
-            retries: int = Defaults.Retries,
+            timeout: int = 3,
+            retries: int = 3,
     ) -> None:
         """Initialize Network Growatt."""
 
         if network_type.lower() == "tcp":
             self.client = AsyncModbusTcpClient(
                 host,
-                port if port else Defaults.TcpPort,
+                port if port else 502,
                 timeout=timeout,
                 retries=retries,
             )
@@ -171,7 +171,7 @@ class GrowattNetwork(GrowattModbusBase):
         elif network_type.lower() == "udp":
             self.client = AsyncModbusUdpClient(
                 host,
-                port if port else Defaults.UdpPort,
+                port if port else 502,
                 framer=ModbusRtuFramer,
                 timeout=timeout,
                 retries=retries,
