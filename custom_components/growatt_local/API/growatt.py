@@ -11,7 +11,6 @@ from collections.abc import Sequence
 from datetime import datetime, timedelta
 from typing import Any
 
-from pymodbus.client import ModbusBaseClient
 from pymodbus.client.serial import AsyncModbusSerialClient
 from pymodbus.client.tcp import AsyncModbusTcpClient
 from pymodbus.client.udp import AsyncModbusUdpClient
@@ -49,7 +48,7 @@ _LOGGER = logging.getLogger(__name__)
 
 
 class GrowattModbusBase:
-    client: ModbusBaseClient
+    client: AsyncModbusTcpClient | AsyncModbusUdpClient | AsyncModbusSerialClient
 
     @abstractmethod
     def __init__(self):

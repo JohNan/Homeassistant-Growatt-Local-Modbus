@@ -24,11 +24,11 @@ _LOGGER = logging.getLogger(__name__)
 def get_keys_from_register(register: tuple[GrowattDeviceRegisters, ...]) -> set[int]:
     results = set()
     for value in register:
-        results.add(value.key)
+        results.add(value.register)
 
         if value.length > 1:
             for i in range(value.length):
-                results.add(value.key + i)
+                results.add(value.register + i)
 
     return results
 
