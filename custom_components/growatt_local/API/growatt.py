@@ -131,11 +131,12 @@ class GrowattModbusBase:
         await self.client.write_register(50, second)
 
     async def write_register(self, register, payload, unit) -> ModbusResponse:
+        kwargs = {"slave": unit} if unit else {}
         builder = BinaryPayloadBuilder(byteorder=Endian.Big, wordorder=Endian.Big)
         builder.reset()
         builder.add_16bit_int(payload)
         payload = builder.to_registers()
-        return await self.client.write_register(register, payload[0], unit)
+        return await self.client.write_register(register, payload[0], **kwargs)
 
     async def read_holding_registers(self, start_index, length, unit) -> dict[int, int]:
         data = await self.client.read_holding_registers(start_index, length, unit)
