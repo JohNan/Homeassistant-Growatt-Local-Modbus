@@ -126,6 +126,8 @@ ATTR_TIME_1_PRIORITY = "time_1_priority"
 ATTR_TIME_2 = "time_2"
 ATTR_TIME_3 = "time_3"
 ATTR_TIME_4 = "time_4"
+ATTR_TIME_5 = "time_5"
+ATTR_TIME_6 = "time_6"
 
 
 class custom_function(type):
