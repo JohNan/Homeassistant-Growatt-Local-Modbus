@@ -83,7 +83,7 @@ from .base import (
     ATTR_SOC_PERCENTAGE, ATTR_DISCHARGE_POWER, ATTR_CHARGE_POWER, ATTR_ENERGY_TO_USER_TODAY, ATTR_ENERGY_TO_USER_TOTAL,
     ATTR_ENERGY_TO_GRID_TODAY, ATTR_ENERGY_TO_GRID_TOTAL, ATTR_DISCHARGE_ENERGY_TODAY, ATTR_DISCHARGE_ENERGY_TOTAL,
     ATTR_CHARGE_ENERGY_TODAY, ATTR_CHARGE_ENERGY_TOTAL, ATTR_AC_CHARGE_ENABLED, ATTR_SERIAL_NUMBER, ATTR_TIME_1,
-    ATTR_TIME_1_START, ATTR_TIME_1_END, ATTR_TIME_1_PRIORITY, ATTR_TIME_2, ATTR_TIME_3, ATTR_TIME_4,
+    ATTR_TIME_1_START, ATTR_TIME_1_END, ATTR_TIME_1_PRIORITY, ATTR_TIME_2, ATTR_TIME_3, ATTR_TIME_4, ATTR_TIME_5, ATTR_TIME_5,
 )
 
 MAXIMUM_DATA_LENGTH = 100
@@ -254,6 +254,20 @@ HOLDING_REGISTERS: tuple[GrowattDeviceRegisters, ...] = (
     GrowattDeviceRegisters(
         name=ATTR_TIME_4,
         register=3044,
+        value_type=custom_function,
+        length=2,
+        function=timeX
+    ),
+    GrowattDeviceRegisters(
+        name=ATTR_TIME_5,
+        register=3050,
+        value_type=custom_function,
+        length=2,
+        function=timeX
+    ),
+    GrowattDeviceRegisters(
+        name=ATTR_TIME_6,
+        register=3052,
         value_type=custom_function,
         length=2,
         function=timeX

@@ -145,6 +145,8 @@ ATTR_TIME_1_PRIORITY = "time_1_priority"
 ATTR_TIME_2 = "time_2"
 ATTR_TIME_3 = "time_3"
 ATTR_TIME_4 = "time_4"
+ATTR_TIME_5 = "time_5"
+ATTR_TIME_6 = "time_6"
 
 INVERTER_SWITCH_TYPES: tuple[GrowattSwitchEntityDescription, ...] = (
     GrowattSwitchEntityDescription(
@@ -622,6 +624,14 @@ INVERTER_SENSOR_TYPES: tuple[GrowattSensorEntityDescription, ...] = (
     GrowattSensorEntityDescription(
         key=ATTR_TIME_4,
         name="Time 4"
+    ),
+    GrowattSensorEntityDescription(
+        key=ATTR_TIME_5,
+        name="Time 5"
+    ),
+    GrowattSensorEntityDescription(
+        key=ATTR_TIME_6,
+        name="Time 6"
     ),
     GrowattSensorEntityDescription(
         key=ATTR_DISCHARGE_ENERGY_TODAY,
