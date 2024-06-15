@@ -265,15 +265,6 @@ HOLDING_REGISTERS: tuple[GrowattDeviceRegisters, ...] = (
         length=2,
         function=timeX
     ),
-    '''
-    GrowattDeviceRegisters(
-        name=ATTR_TIME_6,
-        register=3052,
-        value_type=custom_function,
-        length=2,
-        function=timeX
-    ),
-    '''
     DEVICE_TYPE_CODE_REGISTER,
     NUMBER_OF_TRACKERS_AND_PHASES_REGISTER,
     GrowattDeviceRegisters(
