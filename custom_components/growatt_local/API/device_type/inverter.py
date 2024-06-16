@@ -1,4 +1,4 @@
-"""Device defaults for a Growatt Inverter."""
+"""Device defaults for a Growatt Inverter """
 import logging
 import datetime
 
