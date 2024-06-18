@@ -428,6 +428,11 @@ class GrowattLocalConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         return self.async_create_entry(
             title=f"Growatt {self.data[CONF_MODEL]}", data=self.data
         )
+    
+    @staticmethod
+    @callback
+    def async_get_options_flow(config_entry):
+        return GrowattLocalOptionsFlowHandler(config_entry)
 
 class GrowattLocalOptionsFlowHandler(config_entries.OptionsFlow):
     """Handle an options flow for Growatt."""
@@ -446,46 +451,14 @@ class GrowattLocalOptionsFlowHandler(config_entries.OptionsFlow):
 
         data_schema = vol.Schema(
             {
+                vol.Optional(CONF_IP_ADDRESS, default=options.get(CONF_IP_ADDRESS, data.get(CONF_IP_ADDRESS, None))): str,
+                vol.Optional(CONF_PORT, default=options.get(CONF_PORT, data.get(CONF_PORT, None))): int,
                 vol.Optional(CONF_SCAN_INTERVAL, default=options.get(CONF_SCAN_INTERVAL, data.get(CONF_SCAN_INTERVAL, 60))): int,
                 vol.Optional(CONF_POWER_SCAN_ENABLED, default=options.get(CONF_POWER_SCAN_ENABLED, data.get(CONF_POWER_SCAN_ENABLED, False))): bool,
                 vol.Optional(CONF_POWER_SCAN_INTERVAL, default=options.get(CONF_POWER_SCAN_INTERVAL, data.get(CONF_POWER_SCAN_INTERVAL, 5))): int,
-                vol.Optional(CONF_AC_PHASES, default=options.get(CONF_AC_PHASES, data.get(CONF_AC_PHASES, 1))): selector.NumberSelector(
-                    selector.NumberSelectorConfig(
-                        min=1,
-                        max=3,
-                        step=2,
-                        mode=selector.NumberSelectorMode.BOX,
-                    )
-                ),
-                vol.Optional(CONF_DC_STRING, default=options.get(CONF_DC_STRING, data.get(CONF_DC_STRING, 1))): selector.NumberSelector(
-                    selector.NumberSelectorConfig(
-                        min=1,
-                        max=8,
-                        mode=selector.NumberSelectorMode.BOX,
-                    )
-                ),
                 vol.Optional(CONF_ADDRESS, default=options.get(CONF_ADDRESS, data.get(CONF_ADDRESS, None))): int,
-                vol.Optional(CONF_PORT, default=options.get(CONF_PORT, data.get(CONF_PORT, None))): int,
             }
         )
 
-        return self.async_show_form(step_id="init", data_schema=data_schema)
-
-class GrowattLocalConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
-    """Config flow for Growatt integration."""
-
-    VERSION = 1
-    CONNECTION_CLASS = config_entries.CONN_CLASS_LOCAL_PUSH
-
-    def __init__(self):
-        """Initialize the config flow."""
-        self.server = None
-        self.user_id = None
-        self.data = {}
-        self.force_next_page = False
-
-    @staticmethod
-    @callback
-    def async_get_options_flow(config_entry):
-        return GrowattLocalOptionsFlowHandler(config_entry)
+        return self.async_show_form(step_id="init", data_schema=data_schema
 
