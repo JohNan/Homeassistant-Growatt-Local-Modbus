@@ -16,6 +16,7 @@ from homeassistant.const import (
     CONF_SCAN_INTERVAL,
     SUN_EVENT_SUNRISE,
     SUN_EVENT_SUNSET,
+    EVENT_HOMEASSISTANT_STARTED,
 )
 from homeassistant.core import CALLBACK_TYPE, HomeAssistant, callback
 from homeassistant.helpers.event import (
@@ -49,6 +50,9 @@ from .const import (
 
 _LOGGER = logging.getLogger(__name__)
 
+async def config_entry_update_listener(hass: HomeAssistant, entry: ConfigEntry) -> None:
+    """Update listener, called when the config entry options are changed."""
+    await hass.config_entries.async_reload(entry.entry_id)
 
 async def async_setup_entry(
     hass: HomeAssistant, entry: config_entries.ConfigEntry
@@ -80,8 +84,6 @@ async def async_setup_entry(
         device_layer, entry.data[CONF_ADDRESS]
     )
 
-    await device.connect()
-
     coordinator = GrowattLocalCoordinator(
         hass,
         device,
@@ -95,11 +97,12 @@ async def async_setup_entry(
 
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
 
-    async def update_listener(hass, entry):
-        """Handle options update."""
-        await hass.config_entries.async_reload(entry.entry_id)
+    if hass.is_running:
+        await device.connect()
+    else:
+        hass.bus.async_listen_once(EVENT_HOMEASSISTANT_STARTED, device.connect)
     
-    entry.async_on_unload(entry.add_update_listener(update_listener))
+    entry.async_on_unload(entry.add_update_listener(config_entry_update_listener))
     return True
 
 
@@ -110,7 +113,7 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     await hass.data[DOMAIN][entry.data[CONF_SERIAL_NUMBER]].growatt_api.close()
 
     if unload_ok:
-        del hass.data[DOMAIN][entry.data[CONF_SERIAL_NUMBER]]
+        hass.data[DOMAIN].pop(entry.data[CONF_SERIAL_NUMBER])
     return unload_ok
 
 
