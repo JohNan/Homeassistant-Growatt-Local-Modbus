@@ -56,9 +56,11 @@ class GrowattModbusBase:
 
     async def connect(self):
         """Connecting the modbus device."""
+        _LOGGER.info("GrowattDevice connect")
         await self.client.connect()
 
     def connected(self):
+        _LOGGER.info("GrowattDevice connected")
         return self.client.connected
 
     async def close(self):
