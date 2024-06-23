@@ -58,10 +58,9 @@ async def async_setup_entry(
     hass: HomeAssistant, entry: config_entries.ConfigEntry
 ) -> bool:
     """Load the saved entities."""
-    _LOGGER.warning(
-        "GrowattDevice data: %s",
-        entry.data,
-    )
+    _LOGGER.warning(f"setup entries - data: {entry.data}, options: {entry.options}")
+    options = entry.options
+    
     if entry.data[CONF_LAYER] == CONF_SERIAL:
         device_layer = GrowattSerial(
             entry.data[CONF_SERIAL_PORT],
@@ -73,7 +72,7 @@ async def async_setup_entry(
     elif entry.data[CONF_LAYER] in (CONF_TCP, CONF_UDP):
         device_layer = GrowattNetwork(
             entry.data[CONF_LAYER],
-            entry.data[CONF_IP_ADDRESS],
+            options.get(CONF_IP_ADDRESS, data.get(CONF_IP_ADDRESS, None)),
             entry.data[CONF_PORT],
         )
     else:
