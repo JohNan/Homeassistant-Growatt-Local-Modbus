@@ -233,7 +233,7 @@ class GrowattDevice:
 
         self.unit = unit
 
-    async def connect(self):
+    async def connect(self, *args: Any):
         await self.modbus.connect()
 
     def connected(self):
