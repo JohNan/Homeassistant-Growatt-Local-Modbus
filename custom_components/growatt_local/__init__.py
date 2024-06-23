@@ -60,6 +60,7 @@ async def async_setup_entry(
     """Load the saved entities."""
     _LOGGER.warning(f"setup entries - data: {entry.data}, options: {entry.options}")
     options = entry.options
+    data = entry.data
     
     if entry.data[CONF_LAYER] == CONF_SERIAL:
         device_layer = GrowattSerial(
@@ -71,9 +72,9 @@ async def async_setup_entry(
         )
     elif entry.data[CONF_LAYER] in (CONF_TCP, CONF_UDP):
         device_layer = GrowattNetwork(
-            entry.data[CONF_LAYER],
+            options.get(CONF_LAYER, data.get(CONF_LAYER, None)),
             options.get(CONF_IP_ADDRESS, data.get(CONF_IP_ADDRESS, None)),
-            entry.data[CONF_PORT],
+            options.get(CONF_PORT, data.get(CONF_PORT, None)),
         )
     else:
         _LOGGER.warning(
